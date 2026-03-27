@@ -47,7 +47,7 @@ Umożliwiamy nie tylko zadania jednorazowe (fine-tuning), ale i ciągłe. Klienc
 Aby podłączyć swój serwer do Sewers i zacząć zarabiać, wystarczy pobrać nasz kontener i podać klucz autoryzacyjny.
 
 ```bash
-docker pull gniazdoai/worker-node:latest
+docker pull sewers/worker-node:latest
 
 docker run -d \
   --name sewers \
