@@ -42,11 +42,15 @@
       </v-container>
     </v-main>
     <GlobalNotifications />
+    <GlobalLoader />
+    <GlobalContextMenu />
   </v-app>
 </template>
 
 <script setup lang="ts">
 import GlobalNotifications from './components/GlobalNotifications.vue'
+import GlobalLoader from './components/GlobalLoader.vue'
+import GlobalContextMenu from './components/GlobalContextMenu.vue'
 import { ref } from 'vue'
 
 const links = ref([
