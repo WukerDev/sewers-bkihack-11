@@ -37,6 +37,13 @@ declare module 'vue-router/auto-routes' {
       Record<never, never>,
       | never
     >,
+    '/taskCreator/': RouteRecordInfo<
+      '/taskCreator/',
+      '/taskCreator',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
   }
 
   /**
@@ -59,6 +66,12 @@ declare module 'vue-router/auto-routes' {
     'src/pages/example/index.vue': {
       routes:
         | '/example/'
+      views:
+        | never
+    }
+    'src/pages/taskCreator/index.vue': {
+      routes:
+        | '/taskCreator/'
       views:
         | never
     }
