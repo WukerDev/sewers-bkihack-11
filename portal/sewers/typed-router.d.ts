@@ -30,6 +30,20 @@ declare module 'vue-router/auto-routes' {
       Record<never, never>,
       | never
     >,
+    '/dashbord/': RouteRecordInfo<
+      '/dashbord/',
+      '/dashbord',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/dashbord/ServerDetailsModal': RouteRecordInfo<
+      '/dashbord/ServerDetailsModal',
+      '/dashbord/ServerDetailsModal',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
     '/example/': RouteRecordInfo<
       '/example/',
       '/example',
@@ -60,6 +74,18 @@ declare module 'vue-router/auto-routes' {
     'src/pages/index.vue': {
       routes:
         | '/'
+      views:
+        | never
+    }
+    'src/pages/dashbord/index.vue': {
+      routes:
+        | '/dashbord/'
+      views:
+        | never
+    }
+    'src/pages/dashbord/ServerDetailsModal.vue': {
+      routes:
+        | '/dashbord/ServerDetailsModal'
       views:
         | never
     }
