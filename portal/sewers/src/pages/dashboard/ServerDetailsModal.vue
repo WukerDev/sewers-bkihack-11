@@ -46,7 +46,7 @@
 </template>
 
 <script setup lang="ts">
-import { useMainStore } from './store' // Upewnij się, że ścieżka do store'a jest prawidłowa
+import { useMainStore } from './store.ts' // Upewnij się, że ścieżka do store'a jest prawidłowa
 
 // Podpinamy store, aby modal sam wiedział, czy ma się wyświetlić
 const store = useMainStore()

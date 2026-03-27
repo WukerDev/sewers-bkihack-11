@@ -1,12 +1,12 @@
 <template>
   <v-container fluid class="vista-background min-vh-100">
     <v-row class="mb-4">
-      <v-col v-for="(value, key, index) in metricsConfig" :key="index" cols="12" sm="6" md="2" class="flex-grow-1">
+      <v-col v-for="(value, key, index) in config.metricsConfig" :key="index" cols="12" sm="6" md="2" class="flex-grow-1">
         <v-card class="aero-glass">
           <div class="aero-title-bar">{{ value.label }}</div>
           <v-card-text class="text-center pb-2">
             <div class="text-h4 font-weight-bold text-white text-glow">
-              {{ store.metrics[key as keyof typeof store.metrics] }}
+              {{ config.metrics[key as keyof typeof config.metrics] }}
             </div>
           </v-card-text>
         </v-card>
@@ -25,7 +25,7 @@
         <v-card class="aero-glass h-100 d-flex flex-column">
           <div class="aero-title-bar">Katalog Dostawców</div>
           <div class="flex-grow-1 overflow-y-auto pt-2 pb-2" style="max-height: 450px;">
-            <div v-for="cluster in store.clusters" :key="cluster.id" class="mb-2 px-2">
+            <div v-for="cluster in config.clusters" :key="cluster.id" class="mb-2 px-2">
               <div
                 class="cluster-tree-header"
                 :class="{ 'cluster-open': store.openedClusterId === cluster.id }"
@@ -72,18 +72,13 @@
 import { onMounted, watch } from 'vue'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
-import { useMainStore } from './store'
+import { useMainStore } from './store.ts'
 import ServerDetailsModal from './ServerDetailsModal.vue'
+import {useConfigStore} from "../../core/config.ts";
 
 const store = useMainStore()
+const config = useConfigStore();
 
-const metricsConfig = {
-  onlineNodes: { label: 'Węzłów online' },
-  totalVram: { label: 'Całkowity VRAM' },
-  queuedTasks: { label: 'Zadań w kolejce' },
-  companies: { label: 'Firm w sieci' },
-  gpus: { label: 'Kart graficznych' }
-}
 
 let map: L.Map | null = null
 const markersMap = new Map<string, L.Marker>()
@@ -115,7 +110,7 @@ function renderMarkers() {
   markersMap.forEach(marker => marker.remove())
   markersMap.clear()
 
-  store.clusters.forEach(cluster => {
+  config.clusters.forEach(cluster => {
     const isOpened = store.openedClusterId === cluster.id
     const openedClass = isOpened ? 'marker-selected' : ''
 
@@ -156,28 +151,16 @@ function renderMarkers() {
 function handleClusterClick(clusterId: string) {
   store.toggleCluster(clusterId)
   if (store.openedClusterId === clusterId) {
-    const cluster = store.clusters.find(c => c.id === clusterId)
+    const cluster = config.clusters.find(c => c.id === clusterId)
     if (cluster && map) {
       map.flyTo([cluster.lat, cluster.lng], 9, { duration: 1 })
     }
   }
 }
 
-// Zamiast starego watch na selectedCompanyId, dajemy na openedClusterId
 watch(() => store.openedClusterId, () => {
   renderMarkers()
 })
-
-// Reakcja na kliknięcie z menu LUB z mapy
-function handleMenuClick(id: string) {
-  store.selectCompany(id)
-  const company = store.companies.find(c => c.id === id)
-  if (company && map) {
-    map.flyTo([company.lat, company.lng], 9, { duration: 1 })
-  }
-}
-
-// Odśwież widok markerów na mapie gdy zmieni się wybrana firma
 watch(() => store.selectedCompanyId, () => {
   renderMarkers()
 })
