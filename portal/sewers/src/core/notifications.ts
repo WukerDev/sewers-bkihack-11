@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
-
+import { playSystemSound } from "./audio";
 export const useNotificationStore = defineStore("notifications", () => {
   const snackbar = ref({
     show: false,
@@ -19,6 +19,9 @@ export const useNotificationStore = defineStore("notifications", () => {
   });
 
   function showSnackbar(text: string, color = "info") {
+    const soundType =
+      color === "error" ? "error" : color === "success" ? "success" : "info";
+    playSystemSound(soundType);
     snackbar.value = { show: true, text, color };
   }
 
@@ -39,6 +42,7 @@ export const useNotificationStore = defineStore("notifications", () => {
       onConfirm: options.onConfirm || null,
       onCancel: options.onCancel || null,
     };
+    playSystemSound("info");
   }
 
   function closeDialog() {
