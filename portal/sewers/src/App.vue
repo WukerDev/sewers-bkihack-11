@@ -17,11 +17,14 @@
       <v-menu>
         <template v-slot:activator="{ props }">
           <v-btn icon v-bind="props" class="ml-2 mr-3">
-          <div class="vista-frame">
-            <v-avatar size="40">
-              <v-img src="https://9611ebabdd7aa7a3c429-608cd691ca2791bf39ae82b0c902da1a.ssl.cf1.rackcdn.com/0-Betsy_redo_3.jpg" alt="Avatar"></v-img>
-            </v-avatar>
-          </div>
+            <div class="vista-frame">
+              <v-avatar size="40">
+                <v-img
+                  src="https://9611ebabdd7aa7a3c429-608cd691ca2791bf39ae82b0c902da1a.ssl.cf1.rackcdn.com/0-Betsy_redo_3.jpg"
+                  alt="Avatar"
+                ></v-img>
+              </v-avatar>
+            </div>
           </v-btn>
         </template>
         <v-list class="aero-glass" bg-color="transparent">
@@ -46,21 +49,21 @@
 </template>
 
 <script setup lang="ts">
-import GlobalNotifications from './components/GlobalNotifications.vue'
-import { ref } from 'vue'
+import GlobalNotifications from "./components/GlobalNotifications.vue";
+import { ref } from "vue";
 
 const links = ref([
-  { title: 'Start', to: '/' },
-  { title: 'Dashboard', to: '/dashboard' },
-  { title: 'Taski', to: '/tasks' },
-  { title: 'Agenci AI', to: '/agents' },
-  { title: 'Biling', to: '/billing' },
-  { title: 'Dla Dostawców', to: '/providers' },
-  { title: 'API', to: '/api-docs' }
-])
+  { title: "Start", to: "/" },
+  { title: "Dashboard", to: "/dashboard" },
+  { title: "Taski", to: "/tasks" },
+  { title: "Agenci AI", to: "/agents" },
+  { title: "Biling", to: "/billing" },
+  { title: "Dla Dostawców", to: "/providers" },
+  { title: "API", to: "/api-docs" },
+]);
 
 const profileMenu = ref([
-  { title: 'Ustawienia', action: () => console.log('Kliknięto ustawienia') },
-  { title: 'Wyloguj', action: () => console.log('Wylogowano') }
-])
+  { title: "Ustawienia", action: () => console.log("Kliknięto ustawienia") },
+  { title: "Wyloguj", action: () => console.log("Wylogowano") },
+]);
 </script>

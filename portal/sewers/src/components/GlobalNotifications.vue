@@ -4,11 +4,16 @@
       v-model="store.snackbar.show"
       :color="store.snackbar.color"
       timeout="3000"
-      content-class="aero-glass"
+      content-class="aero-glass text-success"
     >
       {{ store.snackbar.text }}
       <template v-slot:actions>
-        <v-btn variant="text" @click="store.snackbar.show = false">Zamknij</v-btn>
+        <v-btn
+          variant="text"
+          class="text-error"
+          @click="store.snackbar.show = false"
+          >Zamknij</v-btn
+        >
       </template>
     </v-snackbar>
 
@@ -17,7 +22,13 @@
         <v-card-title class="d-flex align-center aero-titlebar">
           {{ store.dialog.title }}
           <v-spacer></v-spacer>
-          <v-btn icon="mdi-close" variant="text" density="comfortable" @click="handleCancel" class="aero-close-btn"></v-btn>
+          <v-btn
+            icon="mdi-close"
+            variant="text"
+            density="comfortable"
+            @click="handleCancel"
+            class="aero-close-btn"
+          ></v-btn>
         </v-card-title>
 
         <div class="aero-window-content">
@@ -48,17 +59,17 @@
 </template>
 
 <script setup lang="ts">
-import { useNotificationStore } from '../core/notifications'
+import { useNotificationStore } from "../core/notifications";
 
-const store = useNotificationStore()
+const store = useNotificationStore();
 
 function handleConfirm() {
-  if (store.dialog.onConfirm) store.dialog.onConfirm()
-  store.closeDialog()
+  if (store.dialog.onConfirm) store.dialog.onConfirm();
+  store.closeDialog();
 }
 
 function handleCancel() {
-  if (store.dialog.onCancel) store.dialog.onCancel()
-  store.closeDialog()
+  if (store.dialog.onCancel) store.dialog.onCancel();
+  store.closeDialog();
 }
 </script>
