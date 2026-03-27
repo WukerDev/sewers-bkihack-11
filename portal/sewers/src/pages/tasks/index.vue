@@ -22,7 +22,7 @@
           >
           <v-card-text class="pt-4">
             <div
-              v-for="task in taskStore.taskList"
+              v-for="task in config.taskList"
               :key="task.id"
               class="task-row d-flex align-center mb-3 pa-3"
             >
@@ -93,7 +93,7 @@
                 <div class="section-label">2. Typ zadania</div>
                 <v-select
                   v-model="taskStore.newTask.type"
-                  :items="taskStore.taskTypes"
+                  :items="config.taskTypes"
                   item-title="label"
                   item-value="value"
                   label="Wybierz rodzaj operacji"
@@ -150,7 +150,7 @@
                 <div class="section-label">4. Model Bazowy</div>
                 <v-select
                   v-model="taskStore.newTask.baseModel"
-                  :items="taskStore.availableModels"
+                  :items="config.availableModels"
                   label="Wybierz model"
                   variant="solo"
                   class="aero-input"
@@ -229,8 +229,10 @@
 import { ref } from "vue";
 import { useTaskStore } from "./store";
 import { useNotificationStore } from "../../core/notifications";
+import {useConfigStore} from "../../core/config.ts";
 
 const taskStore = useTaskStore();
+const config = useConfigStore();
 const notificationStore = useNotificationStore();
 const isWizardOpen = ref(false);
 
