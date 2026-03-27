@@ -12,4 +12,12 @@
 </template>
 
 <script setup lang="ts">
+import { useHomeStore } from './store'
+import { onMounted } from 'vue'
+
+const homeStore = useHomeStore()
+
+onMounted(() => {
+  homeStore.fetchItems()
+})
 </script>
