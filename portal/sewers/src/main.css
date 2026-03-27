@@ -51,3 +51,113 @@ body {
     0 4px 10px rgba(var(--v-theme-primary), 0.3),
     inset 0 1px 2px white;
 }
+
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5), inset 0 2px 10px rgba(255, 255, 255, 0.1);
+}
+
+.vista-frame {
+  display: inline-flex;
+  padding: 5px;
+  background: linear-gradient(135deg, rgba(255,255,255,0.7) 0%, rgba(200,200,200,0.3) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  border-radius: 12px;
+  box-shadow:
+    /* Błękitna poświata Aero */
+    0 0 15px rgba(0, 200, 255, 0.6),
+    /* Cień wewnętrzny dla efektu głębi */
+    inset 0 0 10px rgba(0, 0, 0, 0.2),
+    /* Połysk zewnętrzny */
+    0 2px 5px rgba(255, 255, 255, 0.8);
+  position: relative;
+  overflow: hidden;
+}
+
+.vista-frame::after {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    45deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.1) 45%,
+    rgba(255, 255, 255, 0.5) 50%,
+    rgba(255, 255, 255, 0.1) 55%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transform: rotate(30deg);
+}
+
+.v-theme--dark .vista-frame {
+  background: linear-gradient(135deg, rgba(50,50,50,0.7) 0%, rgba(30,30,30,0.3) 100%);
+  border: 1px solid rgba(100, 100, 100, 0.5);
+  box-shadow:
+    0 0 20px rgba(0, 150, 255, 0.5),
+    inset 0 0 15px rgba(0, 0, 0, 0.5);
+}
+
+.aero-window {
+  padding: 4px;
+  border-radius: 8px;
+}
+
+.aero-titlebar {
+  color: #000;
+  text-shadow: 0 0 5px rgba(255, 255, 255, 0.8);
+  font-weight: bold;
+  padding: 8px 16px;
+}
+
+.v-theme--dark .aero-titlebar {
+  color: #fff;
+  text-shadow: 0 0 5px rgba(0, 0, 0, 0.8);
+}
+
+.aero-window-content {
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  margin: 0 2px 2px 2px;
+}
+
+.v-theme--dark .aero-window-content {
+  background: #1e1e1e;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.aero-actions {
+  background: #f0f0f0;
+  border-top: 1px solid #dfdfdf;
+  border-radius: 0 0 4px 4px;
+}
+
+.v-theme--dark .aero-actions {
+  background: #2a2a2a;
+  border-top: 1px solid #333;
+}
+
+.aero-btn {
+  background: linear-gradient(180deg, rgba(255,255,255,0.8) 0%, rgba(200,200,200,0.4) 50%, rgba(150,150,150,0.2) 51%, rgba(200,200,200,0.5) 100%);
+  border: 1px solid rgba(0,0,0,0.4);
+  border-radius: 4px;
+  text-transform: none;
+  font-weight: bold;
+}
+
+.v-theme--dark .aero-btn {
+  background: linear-gradient(180deg, rgba(100,100,100,0.8) 0%, rgba(60,60,60,0.4) 50%, rgba(40,40,40,0.2) 51%, rgba(80,80,80,0.5) 100%);
+  border: 1px solid rgba(255,255,255,0.3);
+}
+
+.aero-close-btn {
+  color: #cc0000;
+  text-shadow: 0 0 2px rgba(255,255,255,0.5);
+  margin-right: -8px;
+}
+
+.aero-close-btn:hover {
+  background: #ff4d4d;
+  color: white;
+}
