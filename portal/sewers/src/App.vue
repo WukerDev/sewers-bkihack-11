@@ -34,8 +34,9 @@
             <v-btn v-bind="props" icon class="avatar-crystal ml-6">
               <v-avatar size="44" class="inner-glow">
                 <v-img
-                  src="https://9611ebabdd7aa7a3c429-608cd691ca2791bf39ae82b0c902da1a.ssl.cf1.rackcdn.com/0-Betsy_redo_3.jpg"
-                />
+                  src="https://png.pngtree.com/png-vector/20240724/ourmid/pngtree-mouse-aero-png-image_12883749.png"
+                  alt="Avatar"
+                ></v-img>
               </v-avatar>
             </v-btn>
           </template>
