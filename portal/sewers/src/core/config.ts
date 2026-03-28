@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import {computed, ref} from 'vue'
 import {
   ConfigResponse,
   GetTasksResponse,
@@ -12,6 +12,7 @@ import {
   GetBillingResponse
 } from '../proto/main'
 import type {Agent} from "../pages/agents/store.ts";
+import type {NodeMetrics} from "../pages/providers/store.ts";
 
 const API_URL = 'http://localhost/api'
 
@@ -403,6 +404,96 @@ const MOCK_CONFIG: ConfigResponse = {
       }
     }
   }
+    const apiKeys = ref([
+    { id: '1', name: 'Main Backend App', key: 'sk-gniazdo-7cc1-4b82-9d3f', createdAt: '2026-03-15' },
+    { id: '2', name: 'Mobile Integration', key: 'sk-gniazdo-9aa2-11e3-8b22', createdAt: '2026-03-20' }
+  ])
+
+    const nodes = ref([
+  {
+    id: 'node-01',
+    name: 'Politechnika - Lab AI (RTX 4090)',
+    uptime: '14 dni, 6 godz.',
+    powerUsage: '340W',
+    vramUsage: '18.5GB / 24GB',
+    gpuTemp: '68°C',
+    cpuUsage: '12%',
+    netLatency: '5ms',
+    status: 'online'
+  },
+  {
+    id: 'node-02',
+    name: 'Politechnika - Lab AI (RTX 3090)',
+    uptime: '5 dni, 12 godz.',
+    powerUsage: '290W',
+    vramUsage: '10GB / 24GB',
+    gpuTemp: '74°C',
+    cpuUsage: '18%',
+    netLatency: '7ms',
+    status: 'online'
+  },
+  {
+    id: 'node-03',
+    name: 'Serwerownia Wydziałowa (A100)',
+    uptime: '-',
+    powerUsage: '0W',
+    vramUsage: '0GB / 40GB',
+    gpuTemp: '-',
+    cpuUsage: '0%',
+    netLatency: '-',
+    status: 'offline'
+  },
+  {
+    id: 'node-04',
+    name: 'Dyrektoriat (H100 NVLink)',
+    uptime: '62 dni, 1 godz.',
+    powerUsage: '450W',
+    vramUsage: '38GB / 80GB',
+    gpuTemp: '65°C',
+    cpuUsage: '25%',
+    netLatency: '2ms',
+    status: 'maintenance'
+  }
+])
+const providerToken = ref<string>('sk-prov-9876543210abcdef')
+const monthlyEarnings = ref<number>(12450.75)
+
+const historicalEarnings = Array.from({ length: 7 }, (_, i) => ({ day: i+1, amount: monthlyEarnings.value * (1 + (Math.random() - 0.5) * 0.1) }))
+const historicalLatency = Array.from({ length: 7 }, (_, i) => ({ day: i+1, latency: 4 + (Math.random() * 4) }))
+const powerUsageData = [850, 890, 1020, 1050, 980, 1080, 1150, 1080] // w Watach
+const vramUtilizationData = [45, 55, 78, 85, 90, 82, 65, 75] // w %
+      const nodesProvided = ref<NodeMetrics[]>([
+    {
+      id: 'node-01',
+      name: 'Politechnika - Lab AI (RTX 4090)',
+      uptime: '14 dni, 6 godz.',
+      powerUsage: '340W',
+      vramUsage: '18.5GB / 24GB',
+      gpuTemp: '68°C',
+      status: 'online'
+    },
+    {
+      id: 'node-02',
+      name: 'Politechnika - Lab AI (RTX 3090)',
+      uptime: '5 dni, 12 godz.',
+      powerUsage: '290W',
+      vramUsage: '10GB / 24GB',
+      gpuTemp: '74°C',
+      status: 'online'
+    },
+    {
+      id: 'node-03',
+      name: 'Serwerownia Wydziałowa (A100)',
+      uptime: '-',
+      powerUsage: '0W',
+      vramUsage: '0GB / 40GB',
+      gpuTemp: '-',
+      status: 'offline'
+    }
+  ])
+
+
+
   fetchConfigData()
   fetchTasks()
   fetchBillingData()
@@ -415,10 +506,19 @@ const MOCK_CONFIG: ConfigResponse = {
     taskTypes,
     availableModels,
     taskList,
+      nodes,
       deployedAgents,
+      powerUsageData,
       agentTemplates,
+      apiKeys,
+      providerToken,
+      historicalEarnings,
+      historicalLatency,
+      vramUtilizationData,
     fetchConfigData,
     fetchTasks,
+      monthlyEarnings,
+      nodesProvided,
     removeTask,
     pauseTask,
     stopTask,

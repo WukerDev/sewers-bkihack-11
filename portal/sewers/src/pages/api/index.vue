@@ -7,7 +7,6 @@
         <v-card class="aero-glass rounded-xl overflow-hidden">
           <v-tabs v-model="tab" bg-color="rgba(0,0,0,0.2)" color="primary" align-tabs="start">
             <v-tab value="keys"><v-icon start>mdi-key-chain</v-icon>Klucze API</v-tab>
-            <v-tab value="docs"><v-icon start>mdi-file-document-outline</v-icon>Dokumentacja</v-tab>
           </v-tabs>
 
           <v-window v-model="tab" class="pa-6">
@@ -29,7 +28,7 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr v-for="item in apiStore.apiKeys" :key="item.id">
+                  <tr v-for="item in config.apiKeys" :key="item.id">
                     <td>{{ item.name }}</td>
                     <td><code class="aero-code">{{ item.key }}</code></td>
                     <td>{{ item.createdAt }}</td>
@@ -85,7 +84,8 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useApiStore } from './store.ts'
-
+import {useConfigStore} from "../../core/config.ts";
+const config = useConfigStore()
 const apiStore = useApiStore()
 const tab = ref('keys')
 const showAddKey = ref(false)

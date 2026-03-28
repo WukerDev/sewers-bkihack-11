@@ -1,79 +1,27 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useNotificationStore } from '../../core/notifications'
+import {useConfigStore} from "../../core/config.ts";
 
 const notificationStore = useNotificationStore()
 const activeTab = ref('dashboard')
 
-const monthlyEarnings = ref<number>(12450.75)
-const providerToken = ref<string>('sk-prov-9876543210abcdef')
-
-const nodes = ref([
-  {
-    id: 'node-01',
-    name: 'Politechnika - Lab AI (RTX 4090)',
-    uptime: '14 dni, 6 godz.',
-    powerUsage: '340W',
-    vramUsage: '18.5GB / 24GB',
-    gpuTemp: '68°C',
-    cpuUsage: '12%',
-    netLatency: '5ms',
-    status: 'online'
-  },
-  {
-    id: 'node-02',
-    name: 'Politechnika - Lab AI (RTX 3090)',
-    uptime: '5 dni, 12 godz.',
-    powerUsage: '290W',
-    vramUsage: '10GB / 24GB',
-    gpuTemp: '74°C',
-    cpuUsage: '18%',
-    netLatency: '7ms',
-    status: 'online'
-  },
-  {
-    id: 'node-03',
-    name: 'Serwerownia Wydziałowa (A100)',
-    uptime: '-',
-    powerUsage: '0W',
-    vramUsage: '0GB / 40GB',
-    gpuTemp: '-',
-    cpuUsage: '0%',
-    netLatency: '-',
-    status: 'offline'
-  },
-  {
-    id: 'node-04',
-    name: 'Dyrektoriat (H100 NVLink)',
-    uptime: '62 dni, 1 godz.',
-    powerUsage: '450W',
-    vramUsage: '38GB / 80GB',
-    gpuTemp: '65°C',
-    cpuUsage: '25%',
-    netLatency: '2ms',
-    status: 'maintenance'
-  }
-])
-
-const historicalEarnings = Array.from({ length: 7 }, (_, i) => ({ day: i+1, amount: monthlyEarnings.value * (1 + (Math.random() - 0.5) * 0.1) }))
-const historicalLatency = Array.from({ length: 7 }, (_, i) => ({ day: i+1, latency: 4 + (Math.random() * 4) }))
-const powerUsageData = [850, 890, 1020, 1050, 980, 1080, 1150, 1080] // w Watach
-const vramUtilizationData = [45, 55, 78, 85, 90, 82, 65, 75] // w %
+const config = useConfigStore();
 
 const formattedEarnings = computed(() => {
-  return new Intl.NumberFormat('pl-PL', { style: 'currency', currency: 'PLN' }).format(monthlyEarnings.value)
+  return new Intl.NumberFormat('pl-PL', { style: 'currency', currency: 'PLN' }).format(config.monthlyEarnings)
 })
 
 const dockerCommand = computed(() => {
   return `docker run -d --gpus all --name aero-node \\
-  -e API_TOKEN="${providerToken.value}" \\
+  -e API_TOKEN="${config.providerToken}" \\
   -e PROVIDER_MODE="true" \\
   aero-network/worker:latest`
 })
 
 function generateNewToken() {
   const randomChars = Math.random().toString(36).substring(2, 15)
-  providerToken.value = `sk-prov-${randomChars}`
+  config.providerToken = `sk-prov-${randomChars}`
 }
 
 async function copyToClipboard(text: string) {
@@ -157,7 +105,7 @@ function getStatusColor(status: string) {
                   <v-card-subtitle class="text-grey mb-2 px-0 text-center">Trend zarobków (ostatnie 7 dni)</v-card-subtitle>
                   <div class="aero-panel pa-2">
                     <v-sparkline
-                      :model-value="historicalEarnings.map(d => d.amount / 30)"
+                      :model-value="config.historicalEarnings.map(d => d.amount / 30)"
                       color="success"
                       height="70"
                       padding="16"
@@ -192,7 +140,7 @@ function getStatusColor(status: string) {
                     <div class="aero-panel pa-4 mt-6">
                         <v-card-subtitle class="text-grey mb-2 px-0">Średnie opóźnienie sieciowe (7 dni)</v-card-subtitle>
                         <div class="mock-chart-container latency-chart">
-                            <v-sparkline :model-value="historicalLatency.map(d => d.latency)" :labels="historicalLatency.map(d => `${d.latency.toFixed(1)}ms`)" color="info" height="40" smooth line-width="2" padding="10" label-size="8"></v-sparkline>
+                            <v-sparkline :model-value="config.historicalLatency.map(d => d.latency)" :labels="config.historicalLatency.map(d => `${d.latency.toFixed(1)}ms`)" color="info" height="40" smooth line-width="2" padding="10" label-size="8"></v-sparkline>
                         </div>
                     </div>
                 </v-card-text>
@@ -209,7 +157,7 @@ function getStatusColor(status: string) {
               <v-card-subtitle class="px-0 pb-4">Ostatnie 8 godzin (w Watach)</v-card-subtitle>
               <div class="aero-panel pa-2">
                 <v-sparkline
-                  :model-value="powerUsageData"
+                  :model-value="config.powerUsageData"
                   color="warning"
                   height="60"
                   padding="10"
@@ -235,7 +183,7 @@ function getStatusColor(status: string) {
               <v-card-subtitle class="px-0 pb-4">Średnie obciążenie (% całkowitej pojemności)</v-card-subtitle>
               <div class="aero-panel pa-2">
                  <v-sparkline
-                  :model-value="vramUtilizationData"
+                  :model-value="config.vramUtilizationData"
                   color="info"
                   height="60"
                   padding="10"
@@ -270,7 +218,7 @@ function getStatusColor(status: string) {
 
               <v-window-item value="dashboard" class="pa-1">
                 <v-row>
-                  <v-col cols="12" md="6" lg="4" v-for="node in nodes" :key="node.id">
+                  <v-col cols="12" md="6" lg="4" v-for="node in config.nodesProvided" :key="node.id">
                     <v-card class="aero-panel pa-5 h-100 d-flex flex-column">
 
                       <div class="d-flex justify-space-between align-center mb-4">
@@ -343,7 +291,7 @@ function getStatusColor(status: string) {
                     <div>
                       <div class="text-caption text-grey-darken-1 mb-1">Twój aktualny token API:</div>
                       <v-chip class="font-weight-bold" color="primary" variant="tonal">
-                        {{ providerToken }}
+                        {{ config.providerToken }}
                       </v-chip>
                     </div>
 
