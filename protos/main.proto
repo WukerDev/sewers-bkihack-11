@@ -2,8 +2,6 @@ syntax = "proto3";
 
 package sewers;
 
-
-
 message Gpu{
 string id = 1;
 string model = 2;
@@ -171,6 +169,66 @@ message GetBillingResponse {
   double hourly_rate = 3;
   repeated double daily_spending = 4;
   repeated int32 resource_usage = 5;
+}
+
+message ApiKey {
+  string id = 1;
+  string name = 2;
+  string key = 3;
+  string created_at = 4;
+}
+
+message GetApiKeysRequest {}
+
+message GetApiKeysResponse {
+  repeated ApiKey keys = 1;
+}
+
+service ApiService {
+  rpc GetApiKeys (GetApiKeysRequest) returns (GetApiKeysResponse);
+}
+
+message ProviderNode {
+  string id = 1;
+  string name = 2;
+  string uptime = 3;
+  string power_usage = 4;
+  string vram_usage = 5;
+  string gpu_temp = 6;
+  string cpu_usage = 7;
+  string net_latency = 8;
+  string status = 9;
+}
+
+message GetNodesRequest {}
+
+message GetNodesResponse {
+  repeated ProviderNode nodes = 1;
+}
+
+service ProviderService {
+  rpc GetNodes (GetNodesRequest) returns (GetNodesResponse);
+}
+
+
+message Agent {
+  string id = 1;
+  string name = 2;
+  string specialization = 3;
+  string status = 4;
+  double monthly_cost = 5;
+  string node = 6;
+  string avatar = 7;
+}
+
+message GetAgentsRequest {}
+
+message GetAgentsResponse {
+  repeated Agent agents = 1;
+}
+
+service AgentService {
+  rpc GetAgents (GetAgentsRequest) returns (GetAgentsResponse);
 }
 
 service BillingService {
