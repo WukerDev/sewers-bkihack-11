@@ -2,23 +2,45 @@ syntax = "proto3";
 
 package sewers;
 
-message Server {
+
+
+message Gpu{
+string id = 1;
+string model = 2;
+double vram = 3;
+int32 gpu_id = 4;
+double temperature = 5;
+double vram_usage = 6;
+}
+
+message Cpu{
+string id = 1;
+string model = 2;
+int32 threads = 3;
+int32 cpu_id = 4;
+double temperature = 5;
+int32 threads_usage = 6;
+}
+
+message Manhole {
   string id = 1;
-  string gpu = 2;
-  string vram = 3;
+
+  repeated Cpu cpus = 2;
+  repeated Gpu gpus = 3;
   string ram = 4;
-  int32 cpu_threads = 5;
-  double price_per_tflops = 6;
-  int32 load = 7;
-  string status = 8;
-  string availability = 9;
+
+  double price_per_tflops = 5;
+
+
+  string status = 6;
+
 }
 
 message Company {
   string id = 1;
   string name = 2;
   string status = 3;
-  repeated Server servers = 4;
+  repeated Manhole manholes = 4;
 }
 
 message Cluster {
