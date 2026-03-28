@@ -1,48 +1,42 @@
 import docker
 import os
+import logging
 
 client = docker.from_env()
 
 def run_task_container(image, command, task_id, gpu_id=0):
-    """
-    Uruchamia odizolowany kontener z zadaniem AI.
-    
-    Wejście:
-    - image (str): Nazwa obrazu (np. 'pytorch/pytorch:latest')
-    - command (str): Komenda do wykonania wewnątrz kontenera.
-    - task_id (str): Unikalny ID zadania dla logów.
-    - gpu_id (int): Indeks karty graficznej do przypisania.
-    
-    Wyjście:
-    - Dict: Wynik operacji (success, logs, container_id).
-    """
+    # Uruchamia odizolowany kontener z zadaniem AI.
+    data_path = os.path.abspath("./data")
+    output_path = os.path.abspath("./output")
+    os.makedirs(data_path, exist_ok=True)
+    os.makedirs(output_path, exist_ok=True)
+
     try:
-        # Tworzymy ograniczone zasoby (bezpieczeństwo!)
+        logging.info(f"🐳 Start kontenera {task_id}")
         container = client.containers.run(
             image=image,
             command=command,
             name=f"sewers-task-{task_id}",
             device_requests=[
-                docker.types.DeviceRequest(device_ids=[str(gpu_id)], capabilities=[['gpu']])
-            ],
-            # Całkowicie odcinamy internet kontenerowi zadania (opcjonalnie)
-            network_disabled=True, 
-            # Montujemy tylko niezbędne foldery
+                docker.types.DeviceRequest(device_ids=[gpu_id], capabilities=[['gpu']])
+            ] if gpu_id is not None else [],
             volumes={
-                os.path.abspath("./data"): {'bind': '/app/data', 'mode': 'ro'},
-                os.path.abspath("./output"): {'bind': '/app/output', 'mode': 'rw'}
+                data_path: {'bind': '/app/data', 'mode': 'ro'},
+                output_path: {'bind': '/app/output', 'mode': 'rw'}
             },
-            detach=True,
-            mem_limit="16g" # Limit RAMu dla bezpieczeństwa hosta
+            mem_limit="8g", # Przykład limitu
+            nano_cpus=4000000000, # Limit 4 rdzeni (w nanosekundach)
+            detach=True
         )
         
-        result = container.wait() # Czekamy na koniec pracy
+        result = container.wait(timeout=3600) # Timeout 1h dla bezpieczeństwa
         logs = container.logs().decode('utf-8')
-        container.remove() # Sprzątamy po sobie
+        container.remove()
         
         return {
             "status": "completed" if result['StatusCode'] == 0 else "failed",
             "logs": logs
         }
     except Exception as e:
+        logging.error(f"❌ Błąd Dockera: {e}")
         return {"status": "error", "error": str(e)}
