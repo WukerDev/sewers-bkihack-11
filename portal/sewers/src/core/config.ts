@@ -12,7 +12,7 @@ import {
   GetBillingResponse
 } from '../proto/main'
 
-const API_URL = 'http://localhost:8080/api'
+const API_URL = 'http://localhost/api'
 
 export const useConfigStore = defineStore('config', () => {
 
