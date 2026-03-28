@@ -208,7 +208,166 @@ function getStatusColor(status: string) {
             </v-card>
           </v-col>
         </v-row>
+        <v-card
+          class="aero-panel pa-6 mt-6 shadow-lg position-relative overflow-hidden"
+        >
+          <div class="glass-reflection"></div>
 
+          <v-card-title class="aero-title-text px-0 pb-4 d-flex align-center">
+            <div class="vista-shine-effect mr-3 pa-2">
+              <v-icon color="warning">mdi-cog</v-icon>
+            </div>
+            <span class="text-h5 font-weight-bold"
+              >Konfiguracja Mocy i Cen</span
+            >
+          </v-card-title>
+          <div
+            class="aero-schedule-info mb-4 pa-2 d-flex align-center justify-center"
+          >
+            <v-icon size="small" color="primary" class="mr-2"
+              >mdi-clock-outline</v-icon
+            >
+            <span class="text-caption font-weight-bold text-grey-darken-2">
+              Harmonogram taryf:
+              <span class="text-primary">Dzień (06:00 - 22:00)</span>
+              <span class="mx-2 opacity-30">|</span>
+              <span class="text-info">Noc (22:00 - 06:00)</span>
+            </span>
+          </div>
+          <v-row>
+            <v-col cols="12" md="6">
+              <div class="aero-panel-inset pa-5 h-100">
+                <div
+                  class="text-overline font-weight-black mb-4 text-primary d-flex align-center"
+                >
+                  <v-icon size="small" class="mr-2">mdi-currency-usd</v-icon>
+                  Cena energii (PLN/kWh)
+                </div>
+
+                <v-text-field
+                  v-model="config.powerConfig.dayPrice"
+                  label="Taryfa Dzienna"
+                  type="number"
+                  variant="solo"
+                  density="comfortable"
+                  class="aero-input-glass mb-2"
+                  prepend-inner-icon="mdi-weather-sunny"
+                />
+
+                <v-text-field
+                  v-model="config.powerConfig.nightPrice"
+                  label="Taryfa Nocna"
+                  type="number"
+                  variant="solo"
+                  density="comfortable"
+                  class="aero-input-glass"
+                  prepend-inner-icon="mdi-weather-night"
+                />
+              </div>
+            </v-col>
+
+            <v-col cols="12" md="6">
+              <div class="aero-panel-inset pa-5 h-100">
+                <div
+                  class="text-overline font-weight-black mb-4 text-primary d-flex align-center"
+                >
+                  <v-icon size="small" class="mr-2">mdi-chip</v-icon>
+                  Wydajność Hardware (TFLOPS)
+                </div>
+
+                <v-row density="compact">
+                  <v-col cols="6">
+                    <v-text-field
+                      v-model="config.powerConfig.gpuDayPower"
+                      label="GPU Dzień"
+                      type="number"
+                      variant="solo"
+                      density="comfortable"
+                      class="aero-input-glass"
+                      prepend-inner-icon="mdi-weather-sunny"
+                    />
+                  </v-col>
+                  <v-col cols="6">
+                    <v-text-field
+                      v-model="config.powerConfig.gpuNightPower"
+                      label="GPU Noc"
+                      type="number"
+                      variant="solo"
+                      density="comfortable"
+                      class="aero-input-glass"
+                      prepend-inner-icon="mdi-weather-sunny"
+                    />
+                  </v-col>
+                  <v-col cols="6">
+                    <v-text-field
+                      v-model="config.powerConfig.cpuDayPower"
+                      label="CPU Dzień"
+                      type="number"
+                      variant="solo"
+                      density="comfortable"
+                      class="aero-input-glass"
+                      prepend-inner-icon="mdi-weather-night"
+                    />
+                  </v-col>
+                  <v-col cols="6">
+                    <v-text-field
+                      v-model="config.powerConfig.cpuNightPower"
+                      label="CPU Noc"
+                      type="number"
+                      variant="solo"
+                      density="comfortable"
+                      class="aero-input-glass"
+                      prepend-inner-icon="mdi-weather-night"
+                    />
+                  </v-col>
+                </v-row>
+              </div>
+            </v-col>
+          </v-row>
+
+          <div class="aero-panel mt-6 pa-0 overflow-hidden shadow-inner">
+            <v-row no-gutters>
+              <v-col cols="6" class="pa-4 border-end">
+                <div
+                  class="text-caption text-uppercase font-weight-bold text-grey-darken-1"
+                >
+                  Koszt dzienny (est.)
+                </div>
+                <div class="text-h5 font-weight-black text-error">
+                  {{
+                    (
+                      config.powerConfig.dayPrice *
+                      (config.powerConfig.gpuDayPower +
+                        config.powerConfig.cpuDayPower) *
+                      0.005 *
+                      16
+                    ).toFixed(2)
+                  }}
+                  <span class="text-caption">PLN</span>
+                </div>
+              </v-col>
+              <v-col cols="6" class="pa-4">
+                <div
+                  class="text-caption text-uppercase font-weight-bold text-grey-darken-1"
+                >
+                  Koszt nocny (est.)
+                </div>
+                <div class="text-h5 font-weight-black text-primary">
+                  {{
+                    (
+                      config.powerConfig.nightPrice *
+                      (config.powerConfig.gpuNightPower +
+                        config.powerConfig.cpuNightPower) *
+                      0.005 *
+                      8
+                    ).toFixed(2)
+                  }}
+                  <span class="text-caption">PLN</span>
+                </div>
+              </v-col>
+            </v-row>
+          </div>
+        </v-card>
         <v-row class="mt-4">
           <v-col cols="12" md="6">
             <v-card class="aero-panel pa-4 h-100">
@@ -470,7 +629,13 @@ function getStatusColor(status: string) {
   border-bottom: 1px solid rgba(2, 132, 199, 0.2);
   border-radius: 16px 16px 0 0;
 }
-
+.aero-schedule-info {
+  background: rgba(255, 255, 255, 0.3) !important;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.03);
+  backdrop-filter: blur(4px);
+}
 .vista-frame {
   background: linear-gradient(
     135deg,
