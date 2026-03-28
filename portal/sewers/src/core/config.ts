@@ -11,6 +11,7 @@ import {
   Invoice,
   GetBillingResponse
 } from '../proto/main'
+import type {Agent} from "../pages/agents/store.ts";
 
 const API_URL = 'http://localhost/api'
 
@@ -208,6 +209,58 @@ const MOCK_CONFIG: ConfigResponse = {
   ]
 }
 
+ const deployedAgents = ref<Agent[]>([
+    {
+      id: "A-01",
+      name: "Aero-Analyst",
+      specialization: "Analiza Umów",
+      status: "Online",
+      monthlyCost: 450,
+      node: "Warsaw-Alpha",
+      avatar: "mdi-robot-vacuum",
+    },
+    {
+      id: "A-02",
+      name: "Nexus-Shield",
+      specialization: "Cybersecurity",
+      status: "Processing",
+      monthlyCost: 890,
+      node: "Berlin-Beta",
+      avatar: "mdi-shield-check",
+    },
+    {
+      id: "A-03",
+      name: "Flow-Master",
+      specialization: "Optymalizacja Mesh",
+      status: "Online",
+      monthlyCost: 320,
+      node: "Prague-Gamma",
+      avatar: "mdi-waves",
+    },
+  ]);
+
+  const agentTemplates = ref([
+    { name: "Prawnik AI", spec: "Analiza Umów", cost: 600, icon: "mdi-gavel" },
+    {
+      name: "Kodujący Bot",
+      spec: "Debugowanie Python",
+      cost: 400,
+      icon: "mdi-xml",
+    },
+    {
+      name: "Social Media Pro",
+      spec: "Generowanie treści",
+      cost: 300,
+      icon: "mdi-share-variant",
+    },
+    {
+      name: "Analityk Finansowy",
+      spec: "Prognozy rynkowe",
+      cost: 750,
+      icon: "mdi-chart-line",
+    },
+  ]);
+
   const MOCK_TASKS: GetTasksResponse = {
     tasks: [
       { id: 1, name: "Trening asystenta medycznego", type: "Fine-tuning (LoRA)", model: "Bielik-11B", status: "W trakcie", progress: 65 },
@@ -362,6 +415,8 @@ const MOCK_CONFIG: ConfigResponse = {
     taskTypes,
     availableModels,
     taskList,
+      deployedAgents,
+      agentTemplates,
     fetchConfigData,
     fetchTasks,
     removeTask,

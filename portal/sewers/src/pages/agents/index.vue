@@ -18,7 +18,7 @@
 
     <v-row>
       <v-col
-        v-for="agent in store.deployedAgents"
+        v-for="agent in config.deployedAgents"
         :key="agent.id"
         cols="12"
         md="4"
@@ -90,9 +90,11 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { useAgentStore } from "./store";
+import {useConfigStore} from "../../core/config.ts";
 
 const store = useAgentStore();
 const drawer = ref(false);
+const config = useConfigStore();
 
 const confirmHire = (template: any) => {
   store.hireAgent(template);
