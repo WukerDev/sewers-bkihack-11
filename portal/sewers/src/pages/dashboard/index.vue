@@ -255,7 +255,7 @@ watch(
 <style scoped>
 /* BACKGROUND GŁÓWNY */
 .aero-main-container {
-  height: 100vh;
+  height: 87vh;
 }
 
 /* KARTY STATYSTYK */

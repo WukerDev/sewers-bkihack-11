@@ -304,7 +304,7 @@ const monthlyProfit = computed(() => gpuCount.value * selectedGpu.value.profit);
 
 const features = [
   {
-    title: "70% taniej niż AWS",
+    title: "Znacznie taniej niż AWS",
     icon: "mdi-rocket-launch",
     color: "bg-green",
     desc: "Wykorzystujemy uśpioną moc uczelni i software house'ów.",

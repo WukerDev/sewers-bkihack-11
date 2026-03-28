@@ -201,7 +201,7 @@ Authorization: Bearer sk-your-key</pre
 <style scoped>
 /* --- CENTROWANIE I TŁO --- */
 .aero-main-container {
-  min-height: 100vh; /* Wymusza wysokość na całe okno */
+  min-height: 87vh; /* Wymusza wysokość na całe okno */
   width: 100%;
 }
 
