@@ -96,12 +96,11 @@ const drawer = ref(false);
 
 const confirmHire = (template: any) => {
   store.hireAgent(template);
-  drawer.value = false; // Zamknij po wyborze
+  drawer.value = false;
 };
 </script>
 
 <style scoped>
-/* TYPOGRAFIA FRUTIGER */
 .aero-text-gradient {
   background: linear-gradient(to bottom, #034d77, #0284c7);
   -webkit-background-clip: text;

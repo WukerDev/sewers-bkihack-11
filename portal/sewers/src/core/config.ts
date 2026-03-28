@@ -58,71 +58,155 @@ export const useConfigStore = defineStore('config', () => {
     }
   }
 
-    const MOCK_CONFIG: ConfigResponse = {
-    metrics: {
-      onlineNodes: 128,
-      totalVram: '3.2 TB',
-      queuedTasks: 15,
-      companies: 12,
-      gpus: 500
+const MOCK_CONFIG: ConfigResponse = {
+  metrics: {
+    onlineNodes: 128,
+    totalVram: '3.2 TB',
+    queuedTasks: 15,
+    companies: 12,
+    gpus: 500
+  },
+  currentUser: {
+    id: 'u-782',
+    name: 'Admin',
+    avatar: 'https://9611ebabdd7aa7a3c429-608cd691ca2791bf39ae82b0c902da1a.ssl.cf1.rackcdn.com/0-Betsy_redo_3.jpg',
+    role: 'admin',
+    balance: 1450.50,
+    currency: 'PLN'
+  },
+  taskTypes: [
+    { value: "finetuning", label: "Fine-tuning modelu (LoRA)", icon: "mdi-auto-fix", description: "Dotrenowanie modelu na Twoich danych." },
+    { value: "inference", label: "Przetwarzanie wsadowe (Inference)", icon: "mdi-database-export", description: "Masowe generowanie odpowiedzi/predykcji." },
+    { value: "embeddings", label: "Generowanie Embeddingów (RAG)", icon: "mdi-vector-selection", description: "Przygotowanie bazy wiedzy dla agentów AI." },
+    { value: "automl", label: "Strojenie hiperparametrów (AutoML)", icon: "mdi-tune-vertical", description: "Optymalizacja parametrów modelu." },
+    { value: "pretraining", label: "Trening od zera (Pre-training)", icon: "mdi-fountain-pen-tip", description: "Zarezerwowane dla węzłów o potężnej mocy." },
+    { value: "rendering", label: "Rozproszona farma renderująca (3D)", icon: "mdi-video-3d", description: "Blender, Cinema4D, Maya." },
+    { value: "upscaling", label: "Transkodowanie i upscaling wideo", icon: "mdi-movie-filter", description: "Poprawa jakości materiałów przez AI." },
+    { value: "datascience", label: "Akcelerowana analiza danych", icon: "mdi-chart-scatter-plot", description: "Przetwarzanie baz danych na GPU (RAPIDS)." },
+    { value: "simulations", label: "Symulacje inżynieryjne (CAE)", icon: "mdi-molecule", description: "Dynamika płynów i badania naukowe." }
+  ],
+  availableModels: ["Bielik-11B", "Llama-3-8B", "Mistral-7B", "Mixtral-8x7B"],
+  clusters: [
+    {
+      id: 'cl1', name: 'Warszawa', lat: 52.2297, lng: 21.0122, status: 'available',
+      companies: [
+        { id: 'c1', name: 'TechCore Data', status: 'available', servers: [
+          { id: 's1', gpu: 'RTX 4090', vram: '24 GB', ram: '128 GB', cpuThreads: 64, pricePerTflops: 0.15, load: 10, status: 'available', availability: '24/7' },
+          { id: 's2', gpu: 'RTX 3090', vram: '24 GB', ram: '64 GB', cpuThreads: 32, pricePerTflops: 0.10, load: 95, status: 'busy', availability: '08:00 - 20:00' }
+        ]},
+        { id: 'c2', name: 'CyberAI Warsaw', status: 'deploying', servers: [
+          { id: 's3', gpu: 'A100', vram: '80 GB', ram: '256 GB', cpuThreads: 128, pricePerTflops: 0.45, load: 100, status: 'deploying', availability: '24/7' }
+        ]}
+      ]
     },
-    currentUser: {
-      id: 'u-782',
-      name: 'Admin',
-      avatar: 'https://9611ebabdd7aa7a3c429-608cd691ca2791bf39ae82b0c902da1a.ssl.cf1.rackcdn.com/0-Betsy_redo_3.jpg',
-      role: 'admin',
-      balance: 1450.50,
-      currency: 'PLN'
+    {
+      id: 'cl2', name: 'Kraków', lat: 50.0647, lng: 19.9450, status: 'busy',
+      companies: [
+        { id: 'c3', name: 'Vistula Render', status: 'busy', servers: [
+          { id: 's4', gpu: 'RTX 4080', vram: '16 GB', ram: '64 GB', cpuThreads: 32, pricePerTflops: 0.12, load: 90, status: 'busy', availability: 'Weekend' }
+        ]}
+      ]
     },
-    taskTypes: [
-      { value: "finetuning", label: "Fine-tuning modelu (LoRA)", icon: "mdi-auto-fix", description: "Dotrenowanie modelu na Twoich danych." },
-      { value: "inference", label: "Przetwarzanie wsadowe (Inference)", icon: "mdi-database-export", description: "Masowe generowanie odpowiedzi/predykcji." },
-      { value: "embeddings", label: "Generowanie Embeddingów (RAG)", icon: "mdi-vector-selection", description: "Przygotowanie bazy wiedzy dla agentów AI." },
-      { value: "automl", label: "Strojenie hiperparametrów (AutoML)", icon: "mdi-tune-vertical", description: "Optymalizacja parametrów modelu." },
-      { value: "pretraining", label: "Trening od zera (Pre-training)", icon: "mdi-fountain-pen-tip", description: "Zarezerwowane dla węzłów o potężnej mocy." },
-      { value: "rendering", label: "Rozproszona farma renderująca (3D)", icon: "mdi-video-3d", description: "Blender, Cinema4D, Maya." },
-      { value: "upscaling", label: "Transkodowanie i upscaling wideo", icon: "mdi-movie-filter", description: "Poprawa jakości materiałów przez AI." },
-      { value: "datascience", label: "Akcelerowana analiza danych", icon: "mdi-chart-scatter-plot", description: "Przetwarzanie baz danych na GPU (RAPIDS)." },
-      { value: "simulations", label: "Symulacje inżynieryjne (CAE)", icon: "mdi-molecule", description: "Dynamika płynów i badania naukowe." }
-    ],
-    availableModels: ["Bielik-11B", "Llama-3-8B", "Mistral-7B", "Mixtral-8x7B"],
-    clusters: [
+    {
+      id: 'cl3', name: 'Szczecin', lat: 53.4285, lng: 14.8528, status: 'available',
+      companies: [
+        { id: 'c4', name: 'Pomerania Compute', status: 'available', servers: [
+          { id: 's5', gpu: 'A6000', vram: '48 GB', ram: '128 GB', cpuThreads: 64, pricePerTflops: 0.30, load: 20, status: 'available', availability: '24/7' }
+        ]},
+        { id: 'c5', name: 'Szczecin AI', status: 'available', servers: [
+          { id: 's6', gpu: 'RTX 3080', vram: '10 GB', ram: '32 GB', cpuThreads: 16, pricePerTflops: 0.08, load: 5, status: 'available', availability: '24/7' }
+        ]},
+        { id: 'c6', name: 'DeepNode', status: 'offline', servers: [
+          { id: 's7', gpu: 'RTX 4090', vram: '24 GB', ram: '128 GB', cpuThreads: 64, pricePerTflops: 0.16, load: 0, status: 'offline', availability: '24/7' }
+        ]}
+      ]
+    },
       {
-        id: 'cl1', name: 'Warsaw Core', lat: 52.2297, lng: 21.0122, status: 'available',
-        companies: [
-          { id: 'c1', name: 'TechCore Data', status: 'available', servers: [
-            { id: 's1', gpu: 'RTX 4090', vram: '24 GB', ram: '128 GB', cpuThreads: 64, pricePerTflops: 0.15, load: 10, status: 'available', availability: '24/7' },
-            { id: 's2', gpu: 'RTX 3090', vram: '24 GB', ram: '64 GB', cpuThreads: 32, pricePerTflops: 0.10, load: 95, status: 'busy', availability: '08:00 - 20:00' }
-          ]},
-          { id: 'c2', name: 'CyberAI Warsaw', status: 'busy', servers: [
-            { id: 's3', gpu: 'A100', vram: '80 GB', ram: '256 GB', cpuThreads: 128, pricePerTflops: 0.45, load: 100, status: 'busy', availability: '24/7' }
-          ]}
-        ]
-      },
+    id: 'cl4', name: 'Wrocław', lat: 51.1079, lng: 17.0385, status: 'deploying',
+    companies: [
+      { id: 'c7', name: 'Odra Machine Learning', status: 'deploying', servers: [
+        { id: 's8', gpu: 'H100', vram: '80 GB', ram: '256 GB', cpuThreads: 128, pricePerTflops: 0.85, load: 0, status: 'deploying', availability: '24/7' },
+        { id: 's9', gpu: 'RTX 4090', vram: '24 GB', ram: '128 GB', cpuThreads: 64, pricePerTflops: 0.16, load: 0, status: 'deploying', availability: '24/7' }
+      ]},
+      { id: 'c8', name: 'Wrocław Tech Compute', status: 'busy', servers: [
+        { id: 's10', gpu: 'RTX 3090', vram: '24 GB', ram: '64 GB', cpuThreads: 32, pricePerTflops: 0.10, load: 98, status: 'busy', availability: 'Noce i Weekendy' }
+      ]}
+    ]
+  },
+  {
+    id: 'cl5', name: 'Poznań', lat: 52.4064, lng: 16.9252, status: 'available',
+    companies: [
+      { id: 'c9', name: 'Warta AI Labs', status: 'available', servers: [
+        { id: 's11', gpu: 'A100', vram: '40 GB', ram: '128 GB', cpuThreads: 64, pricePerTflops: 0.40, load: 60, status: 'available', availability: '24/7' }
+      ]},
+      { id: 'c10', name: 'PyraRender', status: 'busy', servers: [
+        { id: 's12', gpu: 'RTX 4080', vram: '16 GB', ram: '64 GB', cpuThreads: 24, pricePerTflops: 0.11, load: 100, status: 'busy', availability: '24/7' },
+        { id: 's13', gpu: 'RTX 4080', vram: '16 GB', ram: '64 GB', cpuThreads: 24, pricePerTflops: 0.11, load: 90, status: 'busy', availability: '24/7' }
+      ]}
+    ]
+  },
+  {
+    id: 'cl6', name: 'Gdańsk', lat: 54.3520, lng: 18.6466, status: 'offline',
+    companies: [
+      { id: 'c11', name: 'Tricity Cloud', status: 'offline', servers: [
+        { id: 's14', gpu: 'L40S', vram: '48 GB', ram: '256 GB', cpuThreads: 64, pricePerTflops: 0.50, load: 0, status: 'offline', availability: '24/7' }
+      ]},
+      { id: 'c12', name: 'Baltic Node', status: 'offline', servers: [
+        { id: 's15', gpu: 'RTX 3090', vram: '24 GB', ram: '128 GB', cpuThreads: 32, pricePerTflops: 0.09, load: 0, status: 'offline', availability: '18:00 - 06:00' }
+      ]}
+    ]
+  },
+  {
+    id: 'cl7', name: 'Łódź', lat: 51.7592, lng: 19.4560, status: 'available',
+    companies: [
+      { id: 'c13', name: 'Industrial Compute', status: 'available', servers: [
+        { id: 's16', gpu: 'A6000 Ada', vram: '48 GB', ram: '256 GB', cpuThreads: 64, pricePerTflops: 0.35, load: 10, status: 'available', availability: '24/7' },
+        { id: 's17', gpu: 'RTX 4090', vram: '24 GB', ram: '128 GB', cpuThreads: 64, pricePerTflops: 0.15, load: 30, status: 'available', availability: '24/7' }
+      ]}
+    ]
+  },
+  {
+    id: 'cl8', name: 'Katowice', lat: 50.2649, lng: 19.0238, status: 'available',
+    companies: [
+      { id: 'c14', name: 'Silesia Data Center', status: 'available', servers: [
+        { id: 's18', gpu: 'H100 NVL', vram: '188 GB', ram: '512 GB', cpuThreads: 128, pricePerTflops: 1.20, load: 50, status: 'available', availability: '24/7' }
+      ]},
+      { id: 'c15', name: 'KatoRender', status: 'busy', servers: [
+        { id: 's19', gpu: 'RTX 4090', vram: '24 GB', ram: '128 GB', cpuThreads: 64, pricePerTflops: 0.14, load: 100, status: 'busy', availability: 'Weekendy' }
+      ]}
+    ]
+  },
+  {
+    id: 'cl9', name: 'Lublin', lat: 51.2465, lng: 22.5684, status: 'available',
+    companies: [
+      { id: 'c16', name: 'East Node', status: 'available', servers: [
+        { id: 's20', gpu: 'V100', vram: '32 GB', ram: '128 GB', cpuThreads: 32, pricePerTflops: 0.25, load: 5, status: 'available', availability: '24/7' }
+      ]}
+    ]
+  },
       {
-        id: 'cl2', name: 'Cracow AI Grid', lat: 50.0647, lng: 19.9450, status: 'busy',
-        companies: [
-          { id: 'c3', name: 'Vistula Render', status: 'busy', servers: [
-            { id: 's4', gpu: 'RTX 4080', vram: '16 GB', ram: '64 GB', cpuThreads: 32, pricePerTflops: 0.12, load: 90, status: 'busy', availability: 'Weekend' }
-          ]}
-        ]
-      },
-      {
-        id: 'cl3', name: 'Szczecin Data', lat: 53.4285, lng: 14.8528, status: 'available',
-        companies: [
-          { id: 'c4', name: 'Pomerania Compute', status: 'available', servers: [
-            { id: 's5', gpu: 'A6000', vram: '48 GB', ram: '128 GB', cpuThreads: 64, pricePerTflops: 0.30, load: 20, status: 'available', availability: '24/7' }
-          ]},
-          { id: 'c5', name: 'Szczecin AI', status: 'available', servers: [
-            { id: 's6', gpu: 'RTX 3080', vram: '10 GB', ram: '32 GB', cpuThreads: 16, pricePerTflops: 0.08, load: 5, status: 'available', availability: '24/7' }
-          ]},
-          { id: 'c6', name: 'DeepNode', status: 'busy', servers: [
-            { id: 's7', gpu: 'RTX 4090', vram: '24 GB', ram: '128 GB', cpuThreads: 64, pricePerTflops: 0.16, load: 99, status: 'busy', availability: '24/7' }
-          ]}
-        ]
-      }
+    id: 'cl10', name: 'Bydgoszcz', lat: 53.1235, lng: 18.0084, status: 'available',
+    companies: [
+      { id: 'c17', name: 'Brda AI Compute', status: 'available', servers: [
+        { id: 's21', gpu: 'A40', vram: '48 GB', ram: '256 GB', cpuThreads: 64, pricePerTflops: 0.28, load: 35, status: 'available', availability: '24/7' },
+        { id: 's22', gpu: 'RTX 4090', vram: '24 GB', ram: '128 GB', cpuThreads: 32, pricePerTflops: 0.15, load: 12, status: 'available', availability: 'Weekendy' }
+      ]},
+      { id: 'c18', name: 'Bydgoszcz Tech Hub', status: 'offline', servers: [
+        { id: 's23', gpu: 'RTX 3080 Ti', vram: '12 GB', ram: '64 GB', cpuThreads: 16, pricePerTflops: 0.08, load: 0, status: 'offline', availability: '24/7' }
+      ]}
+    ]
+  },
+  {
+    id: 'cl11', name: 'Toruń', lat: 53.0138, lng: 18.5984, status: 'deploying',
+    companies: [
+      { id: 'c19', name: 'Copernicus Node', status: 'deploying', servers: [
+        { id: 's24', gpu: 'H100', vram: '80 GB', ram: '512 GB', cpuThreads: 128, pricePerTflops: 0.88, load: 0, status: 'deploying', availability: '24/7' },
+        { id: 's25', gpu: 'A100', vram: '40 GB', ram: '256 GB', cpuThreads: 64, pricePerTflops: 0.42, load: 0, status: 'deploying', availability: 'Noce' }
+      ]}
     ]
   }
+  ]
+}
 
   const MOCK_TASKS: GetTasksResponse = {
     tasks: [

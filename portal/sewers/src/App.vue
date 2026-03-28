@@ -63,7 +63,7 @@ const links = ref([
   { title: "Agenci AI", to: "/agents" },
   { title: "Biling", to: "/billing" },
   { title: "Dla Dostawców", to: "/providers" },
-  { title: "API", to: "/api-docs" },
+  { title: "API", to: "/api" },
 ]);
 
 const profileMenu = ref([

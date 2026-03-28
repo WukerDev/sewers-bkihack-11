@@ -84,7 +84,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useApiStore } from './store'
+import { useApiStore } from './store.ts'
 
 const apiStore = useApiStore()
 const tab = ref('keys')
