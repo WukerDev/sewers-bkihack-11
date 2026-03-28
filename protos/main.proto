@@ -134,6 +134,27 @@ message StopTaskResponse {
   string message = 3;
 }
 
+message Invoice {
+  string id = 1;
+  string date = 2;
+  double amount = 3;
+  string status = 4;
+}
+
+message GetBillingRequest {}
+
+message GetBillingResponse {
+  repeated Invoice invoices = 1;
+  double current_month_spending = 2;
+  double hourly_rate = 3;
+  repeated double daily_spending = 4;
+  repeated int32 resource_usage = 5;
+}
+
+service BillingService {
+  rpc GetBilling (GetBillingRequest) returns (GetBillingResponse);
+}
+
 service DashboardService {
   rpc GetConfig (GetConfigRequest) returns (ConfigResponse);
   rpc StreamMetrics (GetConfigRequest) returns (stream Metrics);
