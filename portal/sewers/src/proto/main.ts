@@ -1009,13 +1009,17 @@ export const Manhole: MessageFns<Manhole> = {
       cityLatitude: isSet(object.cityLatitude)
         ? globalThis.Number(object.cityLatitude)
         : isSet(object.city_latitude)
-        ? globalThis.Number(object.city_latitude)
         : 0,
-      pricePerTeraflop: isSet(object.pricePerTeraflop)
-        ? globalThis.Number(object.pricePerTeraflop)
+      pricePerTeraflopDay: isSet(object.pricePerTeraflopDay)
+        ? globalThis.Number(object.pricePerTeraflopDay)
         : isSet(object.price_per_teraflop)
         ? globalThis.Number(object.price_per_teraflop)
         : 0,
+        pricePerTeraflopNight: isSet(object.pricePerTeraflopNight)
+        ? globalThis.Number(object.pricePerTeraflopNight)
+        : isSet(object.price_per_teraflop)
+            ? globalThis.Number(object.price_per_teraflop)
+            : 0,
       address: isSet(object.address) ? globalThis.String(object.address) : "",
     };
   },
@@ -1052,8 +1056,11 @@ export const Manhole: MessageFns<Manhole> = {
     if (message.cityLatitude !== 0) {
       obj.cityLatitude = message.cityLatitude;
     }
-    if (message.pricePerTeraflop !== 0) {
-      obj.pricePerTeraflop = message.pricePerTeraflop;
+    if (message.pricePerTeraflopDay !== 0) {
+      obj.pricePerTeraflop = message.pricePerTeraflopDay;
+    }
+    if (message.pricePerTeraflopNight !== 0) {
+      obj.pricePerTeraflop = message.pricePerTeraflopNight;
     }
     if (message.address !== "") {
       obj.address = message.address;
@@ -1080,7 +1087,8 @@ export const Manhole: MessageFns<Manhole> = {
       : undefined;
     message.cityLongitude = object.cityLongitude ?? 0;
     message.cityLatitude = object.cityLatitude ?? 0;
-    message.pricePerTeraflop = object.pricePerTeraflop ?? 0;
+    message.pricePerTeraflopDay = object.pricePerTeraflopDay ?? 0;
+    message.pricePerTeraflopNight = object.pricePerTeraflopNight ?? 0
     message.address = object.address ?? "";
     return message;
   },
