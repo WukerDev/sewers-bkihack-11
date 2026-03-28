@@ -8,26 +8,63 @@
 import { BinaryReader, BinaryWriter } from "@bufbuild/protobuf/wire";
 import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
+import { Duration } from "./google/protobuf/duration";
 
 export const protobufPackage = "sewers";
 
-export interface Server {
+export interface Gpu {
   id: string;
-  gpu: string;
-  vram: string;
-  ram: string;
-  cpuThreads: number;
-  pricePerTflops: number;
-  load: number;
-  status: string;
-  availability: string;
+  model: string;
+  vram: number;
+  gpuId: number;
+  temperature: number;
+  vramUsage: number;
+}
+
+export interface Cpu {
+  id: string;
+  model: string;
+  threads: number;
+  cpuId: number;
+  temperature: number;
+  threadsUsage: number;
+}
+
+export interface DailyWindow {
+  windowStart: Duration | undefined;
+  windowEnd: Duration | undefined;
+}
+
+export interface WindowSchedule {
+  monday: DailyWindow | undefined;
+  tuesday: DailyWindow | undefined;
+  wednesday: DailyWindow | undefined;
+  thursday: DailyWindow | undefined;
+  friday: DailyWindow | undefined;
+  saturday: DailyWindow | undefined;
+  sunday: DailyWindow | undefined;
+}
+
+export interface Manhole {
+  id: string;
+  name: string;
+  ownerId: string;
+  owner: Company | undefined;
+  gpus: Gpu[];
+  cpus: Cpu[];
+  ram: number;
+  windowSchedule: WindowSchedule | undefined;
+  cityLongitude: number;
+  cityLatitude: number;
+  pricePerTeraflop: number;
+  address: string;
 }
 
 export interface Company {
   id: string;
   name: string;
   status: string;
-  servers: Server[];
+  manholes: Manhole[];
 }
 
 export interface Cluster {
@@ -163,56 +200,87 @@ export interface GetBillingResponse {
   resourceUsage: number[];
 }
 
-function createBaseServer(): Server {
-  return {
-    id: "",
-    gpu: "",
-    vram: "",
-    ram: "",
-    cpuThreads: 0,
-    pricePerTflops: 0,
-    load: 0,
-    status: "",
-    availability: "",
-  };
+export interface ApiKey {
+  id: string;
+  name: string;
+  key: string;
+  createdAt: string;
 }
 
-export const Server: MessageFns<Server> = {
-  encode(message: Server, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+export interface GetApiKeysRequest {
+}
+
+export interface GetApiKeysResponse {
+  keys: ApiKey[];
+}
+
+export interface ProviderNode {
+  id: string;
+  name: string;
+  uptime: string;
+  powerUsage: string;
+  vramUsage: string;
+  gpuTemp: string;
+  cpuUsage: string;
+  netLatency: string;
+  status: string;
+}
+
+export interface GetNodesRequest {
+}
+
+export interface GetNodesResponse {
+  nodes: ProviderNode[];
+}
+
+export interface Agent {
+  id: string;
+  name: string;
+  specialization: string;
+  status: string;
+  monthlyCost: number;
+  node: string;
+  avatar: string;
+}
+
+export interface GetAgentsRequest {
+}
+
+export interface GetAgentsResponse {
+  agents: Agent[];
+}
+
+function createBaseGpu(): Gpu {
+  return { id: "", model: "", vram: 0, gpuId: 0, temperature: 0, vramUsage: 0 };
+}
+
+export const Gpu: MessageFns<Gpu> = {
+  encode(message: Gpu, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
     if (message.id !== "") {
       writer.uint32(10).string(message.id);
     }
-    if (message.gpu !== "") {
-      writer.uint32(18).string(message.gpu);
+    if (message.model !== "") {
+      writer.uint32(18).string(message.model);
     }
-    if (message.vram !== "") {
-      writer.uint32(26).string(message.vram);
+    if (message.vram !== 0) {
+      writer.uint32(25).double(message.vram);
     }
-    if (message.ram !== "") {
-      writer.uint32(34).string(message.ram);
+    if (message.gpuId !== 0) {
+      writer.uint32(32).int32(message.gpuId);
     }
-    if (message.cpuThreads !== 0) {
-      writer.uint32(40).int32(message.cpuThreads);
+    if (message.temperature !== 0) {
+      writer.uint32(41).double(message.temperature);
     }
-    if (message.pricePerTflops !== 0) {
-      writer.uint32(49).double(message.pricePerTflops);
-    }
-    if (message.load !== 0) {
-      writer.uint32(56).int32(message.load);
-    }
-    if (message.status !== "") {
-      writer.uint32(66).string(message.status);
-    }
-    if (message.availability !== "") {
-      writer.uint32(74).string(message.availability);
+    if (message.vramUsage !== 0) {
+      writer.uint32(49).double(message.vramUsage);
     }
     return writer;
   },
 
-  decode(input: BinaryReader | Uint8Array, length?: number): Server {
+  decode(input: BinaryReader | Uint8Array, length?: number): Gpu {
     const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
     const end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseServer();
+    const message = createBaseGpu();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -229,31 +297,31 @@ export const Server: MessageFns<Server> = {
             break;
           }
 
-          message.gpu = reader.string();
+          message.model = reader.string();
           continue;
         }
         case 3: {
-          if (tag !== 26) {
+          if (tag !== 25) {
             break;
           }
 
-          message.vram = reader.string();
+          message.vram = reader.double();
           continue;
         }
         case 4: {
-          if (tag !== 34) {
+          if (tag !== 32) {
             break;
           }
 
-          message.ram = reader.string();
+          message.gpuId = reader.int32();
           continue;
         }
         case 5: {
-          if (tag !== 40) {
+          if (tag !== 41) {
             break;
           }
 
-          message.cpuThreads = reader.int32();
+          message.temperature = reader.double();
           continue;
         }
         case 6: {
@@ -261,31 +329,7 @@ export const Server: MessageFns<Server> = {
             break;
           }
 
-          message.pricePerTflops = reader.double();
-          continue;
-        }
-        case 7: {
-          if (tag !== 56) {
-            break;
-          }
-
-          message.load = reader.int32();
-          continue;
-        }
-        case 8: {
-          if (tag !== 66) {
-            break;
-          }
-
-          message.status = reader.string();
-          continue;
-        }
-        case 9: {
-          if (tag !== 74) {
-            break;
-          }
-
-          message.availability = reader.string();
+          message.vramUsage = reader.double();
           continue;
         }
       }
@@ -297,80 +341,752 @@ export const Server: MessageFns<Server> = {
     return message;
   },
 
-  fromJSON(object: any): Server {
+  fromJSON(object: any): Gpu {
     return {
       id: isSet(object.id) ? globalThis.String(object.id) : "",
-      gpu: isSet(object.gpu) ? globalThis.String(object.gpu) : "",
-      vram: isSet(object.vram) ? globalThis.String(object.vram) : "",
-      ram: isSet(object.ram) ? globalThis.String(object.ram) : "",
-      cpuThreads: isSet(object.cpuThreads)
-        ? globalThis.Number(object.cpuThreads)
-        : isSet(object.cpu_threads)
-        ? globalThis.Number(object.cpu_threads)
+      model: isSet(object.model) ? globalThis.String(object.model) : "",
+      vram: isSet(object.vram) ? globalThis.Number(object.vram) : 0,
+      gpuId: isSet(object.gpuId)
+        ? globalThis.Number(object.gpuId)
+        : isSet(object.gpu_id)
+        ? globalThis.Number(object.gpu_id)
         : 0,
-      pricePerTflops: isSet(object.pricePerTflops)
-        ? globalThis.Number(object.pricePerTflops)
-        : isSet(object.price_per_tflops)
-        ? globalThis.Number(object.price_per_tflops)
+      temperature: isSet(object.temperature) ? globalThis.Number(object.temperature) : 0,
+      vramUsage: isSet(object.vramUsage)
+        ? globalThis.Number(object.vramUsage)
+        : isSet(object.vram_usage)
+        ? globalThis.Number(object.vram_usage)
         : 0,
-      load: isSet(object.load) ? globalThis.Number(object.load) : 0,
-      status: isSet(object.status) ? globalThis.String(object.status) : "",
-      availability: isSet(object.availability) ? globalThis.String(object.availability) : "",
     };
   },
 
-  toJSON(message: Server): unknown {
+  toJSON(message: Gpu): unknown {
     const obj: any = {};
     if (message.id !== "") {
       obj.id = message.id;
     }
-    if (message.gpu !== "") {
-      obj.gpu = message.gpu;
+    if (message.model !== "") {
+      obj.model = message.model;
     }
-    if (message.vram !== "") {
+    if (message.vram !== 0) {
       obj.vram = message.vram;
     }
-    if (message.ram !== "") {
-      obj.ram = message.ram;
+    if (message.gpuId !== 0) {
+      obj.gpuId = Math.round(message.gpuId);
     }
-    if (message.cpuThreads !== 0) {
-      obj.cpuThreads = Math.round(message.cpuThreads);
+    if (message.temperature !== 0) {
+      obj.temperature = message.temperature;
     }
-    if (message.pricePerTflops !== 0) {
-      obj.pricePerTflops = message.pricePerTflops;
-    }
-    if (message.load !== 0) {
-      obj.load = Math.round(message.load);
-    }
-    if (message.status !== "") {
-      obj.status = message.status;
-    }
-    if (message.availability !== "") {
-      obj.availability = message.availability;
+    if (message.vramUsage !== 0) {
+      obj.vramUsage = message.vramUsage;
     }
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<Server>, I>>(base?: I): Server {
-    return Server.fromPartial(base ?? ({} as any));
+  create<I extends Exact<DeepPartial<Gpu>, I>>(base?: I): Gpu {
+    return Gpu.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<Server>, I>>(object: I): Server {
-    const message = createBaseServer();
+  fromPartial<I extends Exact<DeepPartial<Gpu>, I>>(object: I): Gpu {
+    const message = createBaseGpu();
     message.id = object.id ?? "";
-    message.gpu = object.gpu ?? "";
-    message.vram = object.vram ?? "";
-    message.ram = object.ram ?? "";
-    message.cpuThreads = object.cpuThreads ?? 0;
-    message.pricePerTflops = object.pricePerTflops ?? 0;
-    message.load = object.load ?? 0;
-    message.status = object.status ?? "";
-    message.availability = object.availability ?? "";
+    message.model = object.model ?? "";
+    message.vram = object.vram ?? 0;
+    message.gpuId = object.gpuId ?? 0;
+    message.temperature = object.temperature ?? 0;
+    message.vramUsage = object.vramUsage ?? 0;
+    return message;
+  },
+};
+
+function createBaseCpu(): Cpu {
+  return { id: "", model: "", threads: 0, cpuId: 0, temperature: 0, threadsUsage: 0 };
+}
+
+export const Cpu: MessageFns<Cpu> = {
+  encode(message: Cpu, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.id !== "") {
+      writer.uint32(10).string(message.id);
+    }
+    if (message.model !== "") {
+      writer.uint32(18).string(message.model);
+    }
+    if (message.threads !== 0) {
+      writer.uint32(24).int32(message.threads);
+    }
+    if (message.cpuId !== 0) {
+      writer.uint32(32).int32(message.cpuId);
+    }
+    if (message.temperature !== 0) {
+      writer.uint32(41).double(message.temperature);
+    }
+    if (message.threadsUsage !== 0) {
+      writer.uint32(48).int32(message.threadsUsage);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): Cpu {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseCpu();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.id = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.model = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 24) {
+            break;
+          }
+
+          message.threads = reader.int32();
+          continue;
+        }
+        case 4: {
+          if (tag !== 32) {
+            break;
+          }
+
+          message.cpuId = reader.int32();
+          continue;
+        }
+        case 5: {
+          if (tag !== 41) {
+            break;
+          }
+
+          message.temperature = reader.double();
+          continue;
+        }
+        case 6: {
+          if (tag !== 48) {
+            break;
+          }
+
+          message.threadsUsage = reader.int32();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): Cpu {
+    return {
+      id: isSet(object.id) ? globalThis.String(object.id) : "",
+      model: isSet(object.model) ? globalThis.String(object.model) : "",
+      threads: isSet(object.threads) ? globalThis.Number(object.threads) : 0,
+      cpuId: isSet(object.cpuId)
+        ? globalThis.Number(object.cpuId)
+        : isSet(object.cpu_id)
+        ? globalThis.Number(object.cpu_id)
+        : 0,
+      temperature: isSet(object.temperature) ? globalThis.Number(object.temperature) : 0,
+      threadsUsage: isSet(object.threadsUsage)
+        ? globalThis.Number(object.threadsUsage)
+        : isSet(object.threads_usage)
+        ? globalThis.Number(object.threads_usage)
+        : 0,
+    };
+  },
+
+  toJSON(message: Cpu): unknown {
+    const obj: any = {};
+    if (message.id !== "") {
+      obj.id = message.id;
+    }
+    if (message.model !== "") {
+      obj.model = message.model;
+    }
+    if (message.threads !== 0) {
+      obj.threads = Math.round(message.threads);
+    }
+    if (message.cpuId !== 0) {
+      obj.cpuId = Math.round(message.cpuId);
+    }
+    if (message.temperature !== 0) {
+      obj.temperature = message.temperature;
+    }
+    if (message.threadsUsage !== 0) {
+      obj.threadsUsage = Math.round(message.threadsUsage);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<Cpu>, I>>(base?: I): Cpu {
+    return Cpu.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<Cpu>, I>>(object: I): Cpu {
+    const message = createBaseCpu();
+    message.id = object.id ?? "";
+    message.model = object.model ?? "";
+    message.threads = object.threads ?? 0;
+    message.cpuId = object.cpuId ?? 0;
+    message.temperature = object.temperature ?? 0;
+    message.threadsUsage = object.threadsUsage ?? 0;
+    return message;
+  },
+};
+
+function createBaseDailyWindow(): DailyWindow {
+  return { windowStart: undefined, windowEnd: undefined };
+}
+
+export const DailyWindow: MessageFns<DailyWindow> = {
+  encode(message: DailyWindow, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.windowStart !== undefined) {
+      Duration.encode(message.windowStart, writer.uint32(10).fork()).join();
+    }
+    if (message.windowEnd !== undefined) {
+      Duration.encode(message.windowEnd, writer.uint32(18).fork()).join();
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): DailyWindow {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseDailyWindow();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.windowStart = Duration.decode(reader, reader.uint32());
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.windowEnd = Duration.decode(reader, reader.uint32());
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): DailyWindow {
+    return {
+      windowStart: isSet(object.windowStart)
+        ? Duration.fromJSON(object.windowStart)
+        : isSet(object.window_start)
+        ? Duration.fromJSON(object.window_start)
+        : undefined,
+      windowEnd: isSet(object.windowEnd)
+        ? Duration.fromJSON(object.windowEnd)
+        : isSet(object.window_end)
+        ? Duration.fromJSON(object.window_end)
+        : undefined,
+    };
+  },
+
+  toJSON(message: DailyWindow): unknown {
+    const obj: any = {};
+    if (message.windowStart !== undefined) {
+      obj.windowStart = Duration.toJSON(message.windowStart);
+    }
+    if (message.windowEnd !== undefined) {
+      obj.windowEnd = Duration.toJSON(message.windowEnd);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<DailyWindow>, I>>(base?: I): DailyWindow {
+    return DailyWindow.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<DailyWindow>, I>>(object: I): DailyWindow {
+    const message = createBaseDailyWindow();
+    message.windowStart = (object.windowStart !== undefined && object.windowStart !== null)
+      ? Duration.fromPartial(object.windowStart)
+      : undefined;
+    message.windowEnd = (object.windowEnd !== undefined && object.windowEnd !== null)
+      ? Duration.fromPartial(object.windowEnd)
+      : undefined;
+    return message;
+  },
+};
+
+function createBaseWindowSchedule(): WindowSchedule {
+  return {
+    monday: undefined,
+    tuesday: undefined,
+    wednesday: undefined,
+    thursday: undefined,
+    friday: undefined,
+    saturday: undefined,
+    sunday: undefined,
+  };
+}
+
+export const WindowSchedule: MessageFns<WindowSchedule> = {
+  encode(message: WindowSchedule, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.monday !== undefined) {
+      DailyWindow.encode(message.monday, writer.uint32(10).fork()).join();
+    }
+    if (message.tuesday !== undefined) {
+      DailyWindow.encode(message.tuesday, writer.uint32(18).fork()).join();
+    }
+    if (message.wednesday !== undefined) {
+      DailyWindow.encode(message.wednesday, writer.uint32(26).fork()).join();
+    }
+    if (message.thursday !== undefined) {
+      DailyWindow.encode(message.thursday, writer.uint32(34).fork()).join();
+    }
+    if (message.friday !== undefined) {
+      DailyWindow.encode(message.friday, writer.uint32(42).fork()).join();
+    }
+    if (message.saturday !== undefined) {
+      DailyWindow.encode(message.saturday, writer.uint32(50).fork()).join();
+    }
+    if (message.sunday !== undefined) {
+      DailyWindow.encode(message.sunday, writer.uint32(58).fork()).join();
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): WindowSchedule {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseWindowSchedule();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.monday = DailyWindow.decode(reader, reader.uint32());
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.tuesday = DailyWindow.decode(reader, reader.uint32());
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.wednesday = DailyWindow.decode(reader, reader.uint32());
+          continue;
+        }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
+
+          message.thursday = DailyWindow.decode(reader, reader.uint32());
+          continue;
+        }
+        case 5: {
+          if (tag !== 42) {
+            break;
+          }
+
+          message.friday = DailyWindow.decode(reader, reader.uint32());
+          continue;
+        }
+        case 6: {
+          if (tag !== 50) {
+            break;
+          }
+
+          message.saturday = DailyWindow.decode(reader, reader.uint32());
+          continue;
+        }
+        case 7: {
+          if (tag !== 58) {
+            break;
+          }
+
+          message.sunday = DailyWindow.decode(reader, reader.uint32());
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): WindowSchedule {
+    return {
+      monday: isSet(object.monday) ? DailyWindow.fromJSON(object.monday) : undefined,
+      tuesday: isSet(object.tuesday) ? DailyWindow.fromJSON(object.tuesday) : undefined,
+      wednesday: isSet(object.wednesday) ? DailyWindow.fromJSON(object.wednesday) : undefined,
+      thursday: isSet(object.thursday) ? DailyWindow.fromJSON(object.thursday) : undefined,
+      friday: isSet(object.friday) ? DailyWindow.fromJSON(object.friday) : undefined,
+      saturday: isSet(object.saturday) ? DailyWindow.fromJSON(object.saturday) : undefined,
+      sunday: isSet(object.sunday) ? DailyWindow.fromJSON(object.sunday) : undefined,
+    };
+  },
+
+  toJSON(message: WindowSchedule): unknown {
+    const obj: any = {};
+    if (message.monday !== undefined) {
+      obj.monday = DailyWindow.toJSON(message.monday);
+    }
+    if (message.tuesday !== undefined) {
+      obj.tuesday = DailyWindow.toJSON(message.tuesday);
+    }
+    if (message.wednesday !== undefined) {
+      obj.wednesday = DailyWindow.toJSON(message.wednesday);
+    }
+    if (message.thursday !== undefined) {
+      obj.thursday = DailyWindow.toJSON(message.thursday);
+    }
+    if (message.friday !== undefined) {
+      obj.friday = DailyWindow.toJSON(message.friday);
+    }
+    if (message.saturday !== undefined) {
+      obj.saturday = DailyWindow.toJSON(message.saturday);
+    }
+    if (message.sunday !== undefined) {
+      obj.sunday = DailyWindow.toJSON(message.sunday);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<WindowSchedule>, I>>(base?: I): WindowSchedule {
+    return WindowSchedule.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<WindowSchedule>, I>>(object: I): WindowSchedule {
+    const message = createBaseWindowSchedule();
+    message.monday = (object.monday !== undefined && object.monday !== null)
+      ? DailyWindow.fromPartial(object.monday)
+      : undefined;
+    message.tuesday = (object.tuesday !== undefined && object.tuesday !== null)
+      ? DailyWindow.fromPartial(object.tuesday)
+      : undefined;
+    message.wednesday = (object.wednesday !== undefined && object.wednesday !== null)
+      ? DailyWindow.fromPartial(object.wednesday)
+      : undefined;
+    message.thursday = (object.thursday !== undefined && object.thursday !== null)
+      ? DailyWindow.fromPartial(object.thursday)
+      : undefined;
+    message.friday = (object.friday !== undefined && object.friday !== null)
+      ? DailyWindow.fromPartial(object.friday)
+      : undefined;
+    message.saturday = (object.saturday !== undefined && object.saturday !== null)
+      ? DailyWindow.fromPartial(object.saturday)
+      : undefined;
+    message.sunday = (object.sunday !== undefined && object.sunday !== null)
+      ? DailyWindow.fromPartial(object.sunday)
+      : undefined;
+    return message;
+  },
+};
+
+function createBaseManhole(): Manhole {
+  return {
+    id: "",
+    name: "",
+    ownerId: "",
+    owner: undefined,
+    gpus: [],
+    cpus: [],
+    ram: 0,
+    windowSchedule: undefined,
+    cityLongitude: 0,
+    cityLatitude: 0,
+    pricePerTeraflop: 0,
+    address: "",
+  };
+}
+
+export const Manhole: MessageFns<Manhole> = {
+  encode(message: Manhole, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.id !== "") {
+      writer.uint32(10).string(message.id);
+    }
+    if (message.name !== "") {
+      writer.uint32(18).string(message.name);
+    }
+    if (message.ownerId !== "") {
+      writer.uint32(26).string(message.ownerId);
+    }
+    if (message.owner !== undefined) {
+      Company.encode(message.owner, writer.uint32(34).fork()).join();
+    }
+    for (const v of message.gpus) {
+      Gpu.encode(v!, writer.uint32(42).fork()).join();
+    }
+    for (const v of message.cpus) {
+      Cpu.encode(v!, writer.uint32(50).fork()).join();
+    }
+    if (message.ram !== 0) {
+      writer.uint32(57).double(message.ram);
+    }
+    if (message.windowSchedule !== undefined) {
+      WindowSchedule.encode(message.windowSchedule, writer.uint32(66).fork()).join();
+    }
+    if (message.cityLongitude !== 0) {
+      writer.uint32(73).double(message.cityLongitude);
+    }
+    if (message.cityLatitude !== 0) {
+      writer.uint32(81).double(message.cityLatitude);
+    }
+    if (message.pricePerTeraflop !== 0) {
+      writer.uint32(89).double(message.pricePerTeraflop);
+    }
+    if (message.address !== "") {
+      writer.uint32(98).string(message.address);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): Manhole {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseManhole();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.id = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.name = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.ownerId = reader.string();
+          continue;
+        }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
+
+          message.owner = Company.decode(reader, reader.uint32());
+          continue;
+        }
+        case 5: {
+          if (tag !== 42) {
+            break;
+          }
+
+          message.gpus.push(Gpu.decode(reader, reader.uint32()));
+          continue;
+        }
+        case 6: {
+          if (tag !== 50) {
+            break;
+          }
+
+          message.cpus.push(Cpu.decode(reader, reader.uint32()));
+          continue;
+        }
+        case 7: {
+          if (tag !== 57) {
+            break;
+          }
+
+          message.ram = reader.double();
+          continue;
+        }
+        case 8: {
+          if (tag !== 66) {
+            break;
+          }
+
+          message.windowSchedule = WindowSchedule.decode(reader, reader.uint32());
+          continue;
+        }
+        case 9: {
+          if (tag !== 73) {
+            break;
+          }
+
+          message.cityLongitude = reader.double();
+          continue;
+        }
+        case 10: {
+          if (tag !== 81) {
+            break;
+          }
+
+          message.cityLatitude = reader.double();
+          continue;
+        }
+        case 11: {
+          if (tag !== 89) {
+            break;
+          }
+
+          message.pricePerTeraflop = reader.double();
+          continue;
+        }
+        case 12: {
+          if (tag !== 98) {
+            break;
+          }
+
+          message.address = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): Manhole {
+    return {
+      id: isSet(object.id) ? globalThis.String(object.id) : "",
+      name: isSet(object.name) ? globalThis.String(object.name) : "",
+      ownerId: isSet(object.ownerId)
+        ? globalThis.String(object.ownerId)
+        : isSet(object.owner_id)
+        ? globalThis.String(object.owner_id)
+        : "",
+      owner: isSet(object.owner) ? Company.fromJSON(object.owner) : undefined,
+      gpus: globalThis.Array.isArray(object?.gpus) ? object.gpus.map((e: any) => Gpu.fromJSON(e)) : [],
+      cpus: globalThis.Array.isArray(object?.cpus) ? object.cpus.map((e: any) => Cpu.fromJSON(e)) : [],
+      ram: isSet(object.ram) ? globalThis.Number(object.ram) : 0,
+      windowSchedule: isSet(object.windowSchedule)
+        ? WindowSchedule.fromJSON(object.windowSchedule)
+        : isSet(object.window_schedule)
+        ? WindowSchedule.fromJSON(object.window_schedule)
+        : undefined,
+      cityLongitude: isSet(object.cityLongitude)
+        ? globalThis.Number(object.cityLongitude)
+        : isSet(object.city_longitude)
+        ? globalThis.Number(object.city_longitude)
+        : 0,
+      cityLatitude: isSet(object.cityLatitude)
+        ? globalThis.Number(object.cityLatitude)
+        : isSet(object.city_latitude)
+        ? globalThis.Number(object.city_latitude)
+        : 0,
+      pricePerTeraflop: isSet(object.pricePerTeraflop)
+        ? globalThis.Number(object.pricePerTeraflop)
+        : isSet(object.price_per_teraflop)
+        ? globalThis.Number(object.price_per_teraflop)
+        : 0,
+      address: isSet(object.address) ? globalThis.String(object.address) : "",
+    };
+  },
+
+  toJSON(message: Manhole): unknown {
+    const obj: any = {};
+    if (message.id !== "") {
+      obj.id = message.id;
+    }
+    if (message.name !== "") {
+      obj.name = message.name;
+    }
+    if (message.ownerId !== "") {
+      obj.ownerId = message.ownerId;
+    }
+    if (message.owner !== undefined) {
+      obj.owner = Company.toJSON(message.owner);
+    }
+    if (message.gpus?.length) {
+      obj.gpus = message.gpus.map((e) => Gpu.toJSON(e));
+    }
+    if (message.cpus?.length) {
+      obj.cpus = message.cpus.map((e) => Cpu.toJSON(e));
+    }
+    if (message.ram !== 0) {
+      obj.ram = message.ram;
+    }
+    if (message.windowSchedule !== undefined) {
+      obj.windowSchedule = WindowSchedule.toJSON(message.windowSchedule);
+    }
+    if (message.cityLongitude !== 0) {
+      obj.cityLongitude = message.cityLongitude;
+    }
+    if (message.cityLatitude !== 0) {
+      obj.cityLatitude = message.cityLatitude;
+    }
+    if (message.pricePerTeraflop !== 0) {
+      obj.pricePerTeraflop = message.pricePerTeraflop;
+    }
+    if (message.address !== "") {
+      obj.address = message.address;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<Manhole>, I>>(base?: I): Manhole {
+    return Manhole.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<Manhole>, I>>(object: I): Manhole {
+    const message = createBaseManhole();
+    message.id = object.id ?? "";
+    message.name = object.name ?? "";
+    message.ownerId = object.ownerId ?? "";
+    message.owner = (object.owner !== undefined && object.owner !== null)
+      ? Company.fromPartial(object.owner)
+      : undefined;
+    message.gpus = object.gpus?.map((e) => Gpu.fromPartial(e)) || [];
+    message.cpus = object.cpus?.map((e) => Cpu.fromPartial(e)) || [];
+    message.ram = object.ram ?? 0;
+    message.windowSchedule = (object.windowSchedule !== undefined && object.windowSchedule !== null)
+      ? WindowSchedule.fromPartial(object.windowSchedule)
+      : undefined;
+    message.cityLongitude = object.cityLongitude ?? 0;
+    message.cityLatitude = object.cityLatitude ?? 0;
+    message.pricePerTeraflop = object.pricePerTeraflop ?? 0;
+    message.address = object.address ?? "";
     return message;
   },
 };
 
 function createBaseCompany(): Company {
-  return { id: "", name: "", status: "", servers: [] };
+  return { id: "", name: "", status: "", manholes: [] };
 }
 
 export const Company: MessageFns<Company> = {
@@ -384,8 +1100,8 @@ export const Company: MessageFns<Company> = {
     if (message.status !== "") {
       writer.uint32(26).string(message.status);
     }
-    for (const v of message.servers) {
-      Server.encode(v!, writer.uint32(34).fork()).join();
+    for (const v of message.manholes) {
+      Manhole.encode(v!, writer.uint32(34).fork()).join();
     }
     return writer;
   },
@@ -426,7 +1142,7 @@ export const Company: MessageFns<Company> = {
             break;
           }
 
-          message.servers.push(Server.decode(reader, reader.uint32()));
+          message.manholes.push(Manhole.decode(reader, reader.uint32()));
           continue;
         }
       }
@@ -443,7 +1159,7 @@ export const Company: MessageFns<Company> = {
       id: isSet(object.id) ? globalThis.String(object.id) : "",
       name: isSet(object.name) ? globalThis.String(object.name) : "",
       status: isSet(object.status) ? globalThis.String(object.status) : "",
-      servers: globalThis.Array.isArray(object?.servers) ? object.servers.map((e: any) => Server.fromJSON(e)) : [],
+      manholes: globalThis.Array.isArray(object?.manholes) ? object.manholes.map((e: any) => Manhole.fromJSON(e)) : [],
     };
   },
 
@@ -458,8 +1174,8 @@ export const Company: MessageFns<Company> = {
     if (message.status !== "") {
       obj.status = message.status;
     }
-    if (message.servers?.length) {
-      obj.servers = message.servers.map((e) => Server.toJSON(e));
+    if (message.manholes?.length) {
+      obj.manholes = message.manholes.map((e) => Manhole.toJSON(e));
     }
     return obj;
   },
@@ -472,7 +1188,7 @@ export const Company: MessageFns<Company> = {
     message.id = object.id ?? "";
     message.name = object.name ?? "";
     message.status = object.status ?? "";
-    message.servers = object.servers?.map((e) => Server.fromPartial(e)) || [];
+    message.manholes = object.manholes?.map((e) => Manhole.fromPartial(e)) || [];
     return message;
   },
 };
@@ -2579,6 +3295,861 @@ export const GetBillingResponse: MessageFns<GetBillingResponse> = {
     return message;
   },
 };
+
+function createBaseApiKey(): ApiKey {
+  return { id: "", name: "", key: "", createdAt: "" };
+}
+
+export const ApiKey: MessageFns<ApiKey> = {
+  encode(message: ApiKey, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.id !== "") {
+      writer.uint32(10).string(message.id);
+    }
+    if (message.name !== "") {
+      writer.uint32(18).string(message.name);
+    }
+    if (message.key !== "") {
+      writer.uint32(26).string(message.key);
+    }
+    if (message.createdAt !== "") {
+      writer.uint32(34).string(message.createdAt);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): ApiKey {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseApiKey();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.id = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.name = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.key = reader.string();
+          continue;
+        }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
+
+          message.createdAt = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ApiKey {
+    return {
+      id: isSet(object.id) ? globalThis.String(object.id) : "",
+      name: isSet(object.name) ? globalThis.String(object.name) : "",
+      key: isSet(object.key) ? globalThis.String(object.key) : "",
+      createdAt: isSet(object.createdAt)
+        ? globalThis.String(object.createdAt)
+        : isSet(object.created_at)
+        ? globalThis.String(object.created_at)
+        : "",
+    };
+  },
+
+  toJSON(message: ApiKey): unknown {
+    const obj: any = {};
+    if (message.id !== "") {
+      obj.id = message.id;
+    }
+    if (message.name !== "") {
+      obj.name = message.name;
+    }
+    if (message.key !== "") {
+      obj.key = message.key;
+    }
+    if (message.createdAt !== "") {
+      obj.createdAt = message.createdAt;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<ApiKey>, I>>(base?: I): ApiKey {
+    return ApiKey.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<ApiKey>, I>>(object: I): ApiKey {
+    const message = createBaseApiKey();
+    message.id = object.id ?? "";
+    message.name = object.name ?? "";
+    message.key = object.key ?? "";
+    message.createdAt = object.createdAt ?? "";
+    return message;
+  },
+};
+
+function createBaseGetApiKeysRequest(): GetApiKeysRequest {
+  return {};
+}
+
+export const GetApiKeysRequest: MessageFns<GetApiKeysRequest> = {
+  encode(_: GetApiKeysRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): GetApiKeysRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGetApiKeysRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(_: any): GetApiKeysRequest {
+    return {};
+  },
+
+  toJSON(_: GetApiKeysRequest): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<GetApiKeysRequest>, I>>(base?: I): GetApiKeysRequest {
+    return GetApiKeysRequest.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<GetApiKeysRequest>, I>>(_: I): GetApiKeysRequest {
+    const message = createBaseGetApiKeysRequest();
+    return message;
+  },
+};
+
+function createBaseGetApiKeysResponse(): GetApiKeysResponse {
+  return { keys: [] };
+}
+
+export const GetApiKeysResponse: MessageFns<GetApiKeysResponse> = {
+  encode(message: GetApiKeysResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    for (const v of message.keys) {
+      ApiKey.encode(v!, writer.uint32(10).fork()).join();
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): GetApiKeysResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGetApiKeysResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.keys.push(ApiKey.decode(reader, reader.uint32()));
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): GetApiKeysResponse {
+    return { keys: globalThis.Array.isArray(object?.keys) ? object.keys.map((e: any) => ApiKey.fromJSON(e)) : [] };
+  },
+
+  toJSON(message: GetApiKeysResponse): unknown {
+    const obj: any = {};
+    if (message.keys?.length) {
+      obj.keys = message.keys.map((e) => ApiKey.toJSON(e));
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<GetApiKeysResponse>, I>>(base?: I): GetApiKeysResponse {
+    return GetApiKeysResponse.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<GetApiKeysResponse>, I>>(object: I): GetApiKeysResponse {
+    const message = createBaseGetApiKeysResponse();
+    message.keys = object.keys?.map((e) => ApiKey.fromPartial(e)) || [];
+    return message;
+  },
+};
+
+function createBaseProviderNode(): ProviderNode {
+  return {
+    id: "",
+    name: "",
+    uptime: "",
+    powerUsage: "",
+    vramUsage: "",
+    gpuTemp: "",
+    cpuUsage: "",
+    netLatency: "",
+    status: "",
+  };
+}
+
+export const ProviderNode: MessageFns<ProviderNode> = {
+  encode(message: ProviderNode, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.id !== "") {
+      writer.uint32(10).string(message.id);
+    }
+    if (message.name !== "") {
+      writer.uint32(18).string(message.name);
+    }
+    if (message.uptime !== "") {
+      writer.uint32(26).string(message.uptime);
+    }
+    if (message.powerUsage !== "") {
+      writer.uint32(34).string(message.powerUsage);
+    }
+    if (message.vramUsage !== "") {
+      writer.uint32(42).string(message.vramUsage);
+    }
+    if (message.gpuTemp !== "") {
+      writer.uint32(50).string(message.gpuTemp);
+    }
+    if (message.cpuUsage !== "") {
+      writer.uint32(58).string(message.cpuUsage);
+    }
+    if (message.netLatency !== "") {
+      writer.uint32(66).string(message.netLatency);
+    }
+    if (message.status !== "") {
+      writer.uint32(74).string(message.status);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): ProviderNode {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseProviderNode();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.id = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.name = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.uptime = reader.string();
+          continue;
+        }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
+
+          message.powerUsage = reader.string();
+          continue;
+        }
+        case 5: {
+          if (tag !== 42) {
+            break;
+          }
+
+          message.vramUsage = reader.string();
+          continue;
+        }
+        case 6: {
+          if (tag !== 50) {
+            break;
+          }
+
+          message.gpuTemp = reader.string();
+          continue;
+        }
+        case 7: {
+          if (tag !== 58) {
+            break;
+          }
+
+          message.cpuUsage = reader.string();
+          continue;
+        }
+        case 8: {
+          if (tag !== 66) {
+            break;
+          }
+
+          message.netLatency = reader.string();
+          continue;
+        }
+        case 9: {
+          if (tag !== 74) {
+            break;
+          }
+
+          message.status = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ProviderNode {
+    return {
+      id: isSet(object.id) ? globalThis.String(object.id) : "",
+      name: isSet(object.name) ? globalThis.String(object.name) : "",
+      uptime: isSet(object.uptime) ? globalThis.String(object.uptime) : "",
+      powerUsage: isSet(object.powerUsage)
+        ? globalThis.String(object.powerUsage)
+        : isSet(object.power_usage)
+        ? globalThis.String(object.power_usage)
+        : "",
+      vramUsage: isSet(object.vramUsage)
+        ? globalThis.String(object.vramUsage)
+        : isSet(object.vram_usage)
+        ? globalThis.String(object.vram_usage)
+        : "",
+      gpuTemp: isSet(object.gpuTemp)
+        ? globalThis.String(object.gpuTemp)
+        : isSet(object.gpu_temp)
+        ? globalThis.String(object.gpu_temp)
+        : "",
+      cpuUsage: isSet(object.cpuUsage)
+        ? globalThis.String(object.cpuUsage)
+        : isSet(object.cpu_usage)
+        ? globalThis.String(object.cpu_usage)
+        : "",
+      netLatency: isSet(object.netLatency)
+        ? globalThis.String(object.netLatency)
+        : isSet(object.net_latency)
+        ? globalThis.String(object.net_latency)
+        : "",
+      status: isSet(object.status) ? globalThis.String(object.status) : "",
+    };
+  },
+
+  toJSON(message: ProviderNode): unknown {
+    const obj: any = {};
+    if (message.id !== "") {
+      obj.id = message.id;
+    }
+    if (message.name !== "") {
+      obj.name = message.name;
+    }
+    if (message.uptime !== "") {
+      obj.uptime = message.uptime;
+    }
+    if (message.powerUsage !== "") {
+      obj.powerUsage = message.powerUsage;
+    }
+    if (message.vramUsage !== "") {
+      obj.vramUsage = message.vramUsage;
+    }
+    if (message.gpuTemp !== "") {
+      obj.gpuTemp = message.gpuTemp;
+    }
+    if (message.cpuUsage !== "") {
+      obj.cpuUsage = message.cpuUsage;
+    }
+    if (message.netLatency !== "") {
+      obj.netLatency = message.netLatency;
+    }
+    if (message.status !== "") {
+      obj.status = message.status;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<ProviderNode>, I>>(base?: I): ProviderNode {
+    return ProviderNode.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<ProviderNode>, I>>(object: I): ProviderNode {
+    const message = createBaseProviderNode();
+    message.id = object.id ?? "";
+    message.name = object.name ?? "";
+    message.uptime = object.uptime ?? "";
+    message.powerUsage = object.powerUsage ?? "";
+    message.vramUsage = object.vramUsage ?? "";
+    message.gpuTemp = object.gpuTemp ?? "";
+    message.cpuUsage = object.cpuUsage ?? "";
+    message.netLatency = object.netLatency ?? "";
+    message.status = object.status ?? "";
+    return message;
+  },
+};
+
+function createBaseGetNodesRequest(): GetNodesRequest {
+  return {};
+}
+
+export const GetNodesRequest: MessageFns<GetNodesRequest> = {
+  encode(_: GetNodesRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): GetNodesRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGetNodesRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(_: any): GetNodesRequest {
+    return {};
+  },
+
+  toJSON(_: GetNodesRequest): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<GetNodesRequest>, I>>(base?: I): GetNodesRequest {
+    return GetNodesRequest.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<GetNodesRequest>, I>>(_: I): GetNodesRequest {
+    const message = createBaseGetNodesRequest();
+    return message;
+  },
+};
+
+function createBaseGetNodesResponse(): GetNodesResponse {
+  return { nodes: [] };
+}
+
+export const GetNodesResponse: MessageFns<GetNodesResponse> = {
+  encode(message: GetNodesResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    for (const v of message.nodes) {
+      ProviderNode.encode(v!, writer.uint32(10).fork()).join();
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): GetNodesResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGetNodesResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.nodes.push(ProviderNode.decode(reader, reader.uint32()));
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): GetNodesResponse {
+    return {
+      nodes: globalThis.Array.isArray(object?.nodes) ? object.nodes.map((e: any) => ProviderNode.fromJSON(e)) : [],
+    };
+  },
+
+  toJSON(message: GetNodesResponse): unknown {
+    const obj: any = {};
+    if (message.nodes?.length) {
+      obj.nodes = message.nodes.map((e) => ProviderNode.toJSON(e));
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<GetNodesResponse>, I>>(base?: I): GetNodesResponse {
+    return GetNodesResponse.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<GetNodesResponse>, I>>(object: I): GetNodesResponse {
+    const message = createBaseGetNodesResponse();
+    message.nodes = object.nodes?.map((e) => ProviderNode.fromPartial(e)) || [];
+    return message;
+  },
+};
+
+function createBaseAgent(): Agent {
+  return { id: "", name: "", specialization: "", status: "", monthlyCost: 0, node: "", avatar: "" };
+}
+
+export const Agent: MessageFns<Agent> = {
+  encode(message: Agent, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.id !== "") {
+      writer.uint32(10).string(message.id);
+    }
+    if (message.name !== "") {
+      writer.uint32(18).string(message.name);
+    }
+    if (message.specialization !== "") {
+      writer.uint32(26).string(message.specialization);
+    }
+    if (message.status !== "") {
+      writer.uint32(34).string(message.status);
+    }
+    if (message.monthlyCost !== 0) {
+      writer.uint32(41).double(message.monthlyCost);
+    }
+    if (message.node !== "") {
+      writer.uint32(50).string(message.node);
+    }
+    if (message.avatar !== "") {
+      writer.uint32(58).string(message.avatar);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): Agent {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseAgent();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.id = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.name = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.specialization = reader.string();
+          continue;
+        }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
+
+          message.status = reader.string();
+          continue;
+        }
+        case 5: {
+          if (tag !== 41) {
+            break;
+          }
+
+          message.monthlyCost = reader.double();
+          continue;
+        }
+        case 6: {
+          if (tag !== 50) {
+            break;
+          }
+
+          message.node = reader.string();
+          continue;
+        }
+        case 7: {
+          if (tag !== 58) {
+            break;
+          }
+
+          message.avatar = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): Agent {
+    return {
+      id: isSet(object.id) ? globalThis.String(object.id) : "",
+      name: isSet(object.name) ? globalThis.String(object.name) : "",
+      specialization: isSet(object.specialization) ? globalThis.String(object.specialization) : "",
+      status: isSet(object.status) ? globalThis.String(object.status) : "",
+      monthlyCost: isSet(object.monthlyCost)
+        ? globalThis.Number(object.monthlyCost)
+        : isSet(object.monthly_cost)
+        ? globalThis.Number(object.monthly_cost)
+        : 0,
+      node: isSet(object.node) ? globalThis.String(object.node) : "",
+      avatar: isSet(object.avatar) ? globalThis.String(object.avatar) : "",
+    };
+  },
+
+  toJSON(message: Agent): unknown {
+    const obj: any = {};
+    if (message.id !== "") {
+      obj.id = message.id;
+    }
+    if (message.name !== "") {
+      obj.name = message.name;
+    }
+    if (message.specialization !== "") {
+      obj.specialization = message.specialization;
+    }
+    if (message.status !== "") {
+      obj.status = message.status;
+    }
+    if (message.monthlyCost !== 0) {
+      obj.monthlyCost = message.monthlyCost;
+    }
+    if (message.node !== "") {
+      obj.node = message.node;
+    }
+    if (message.avatar !== "") {
+      obj.avatar = message.avatar;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<Agent>, I>>(base?: I): Agent {
+    return Agent.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<Agent>, I>>(object: I): Agent {
+    const message = createBaseAgent();
+    message.id = object.id ?? "";
+    message.name = object.name ?? "";
+    message.specialization = object.specialization ?? "";
+    message.status = object.status ?? "";
+    message.monthlyCost = object.monthlyCost ?? 0;
+    message.node = object.node ?? "";
+    message.avatar = object.avatar ?? "";
+    return message;
+  },
+};
+
+function createBaseGetAgentsRequest(): GetAgentsRequest {
+  return {};
+}
+
+export const GetAgentsRequest: MessageFns<GetAgentsRequest> = {
+  encode(_: GetAgentsRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): GetAgentsRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGetAgentsRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(_: any): GetAgentsRequest {
+    return {};
+  },
+
+  toJSON(_: GetAgentsRequest): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<GetAgentsRequest>, I>>(base?: I): GetAgentsRequest {
+    return GetAgentsRequest.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<GetAgentsRequest>, I>>(_: I): GetAgentsRequest {
+    const message = createBaseGetAgentsRequest();
+    return message;
+  },
+};
+
+function createBaseGetAgentsResponse(): GetAgentsResponse {
+  return { agents: [] };
+}
+
+export const GetAgentsResponse: MessageFns<GetAgentsResponse> = {
+  encode(message: GetAgentsResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    for (const v of message.agents) {
+      Agent.encode(v!, writer.uint32(10).fork()).join();
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): GetAgentsResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGetAgentsResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.agents.push(Agent.decode(reader, reader.uint32()));
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): GetAgentsResponse {
+    return { agents: globalThis.Array.isArray(object?.agents) ? object.agents.map((e: any) => Agent.fromJSON(e)) : [] };
+  },
+
+  toJSON(message: GetAgentsResponse): unknown {
+    const obj: any = {};
+    if (message.agents?.length) {
+      obj.agents = message.agents.map((e) => Agent.toJSON(e));
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<GetAgentsResponse>, I>>(base?: I): GetAgentsResponse {
+    return GetAgentsResponse.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<GetAgentsResponse>, I>>(object: I): GetAgentsResponse {
+    const message = createBaseGetAgentsResponse();
+    message.agents = object.agents?.map((e) => Agent.fromPartial(e)) || [];
+    return message;
+  },
+};
+
+export interface ApiService {
+  GetApiKeys(request: GetApiKeysRequest): Promise<GetApiKeysResponse>;
+}
+
+export const ApiServiceServiceName = "sewers.ApiService";
+export class ApiServiceClientImpl implements ApiService {
+  private readonly rpc: Rpc;
+  private readonly service: string;
+  constructor(rpc: Rpc, opts?: { service?: string }) {
+    this.service = opts?.service || ApiServiceServiceName;
+    this.rpc = rpc;
+    this.GetApiKeys = this.GetApiKeys.bind(this);
+  }
+  GetApiKeys(request: GetApiKeysRequest): Promise<GetApiKeysResponse> {
+    const data = GetApiKeysRequest.encode(request).finish();
+    const promise = this.rpc.request(this.service, "GetApiKeys", data);
+    return promise.then((data) => GetApiKeysResponse.decode(new BinaryReader(data)));
+  }
+}
+
+export interface ProviderService {
+  GetNodes(request: GetNodesRequest): Promise<GetNodesResponse>;
+}
+
+export const ProviderServiceServiceName = "sewers.ProviderService";
+export class ProviderServiceClientImpl implements ProviderService {
+  private readonly rpc: Rpc;
+  private readonly service: string;
+  constructor(rpc: Rpc, opts?: { service?: string }) {
+    this.service = opts?.service || ProviderServiceServiceName;
+    this.rpc = rpc;
+    this.GetNodes = this.GetNodes.bind(this);
+  }
+  GetNodes(request: GetNodesRequest): Promise<GetNodesResponse> {
+    const data = GetNodesRequest.encode(request).finish();
+    const promise = this.rpc.request(this.service, "GetNodes", data);
+    return promise.then((data) => GetNodesResponse.decode(new BinaryReader(data)));
+  }
+}
+
+export interface AgentService {
+  GetAgents(request: GetAgentsRequest): Promise<GetAgentsResponse>;
+}
+
+export const AgentServiceServiceName = "sewers.AgentService";
+export class AgentServiceClientImpl implements AgentService {
+  private readonly rpc: Rpc;
+  private readonly service: string;
+  constructor(rpc: Rpc, opts?: { service?: string }) {
+    this.service = opts?.service || AgentServiceServiceName;
+    this.rpc = rpc;
+    this.GetAgents = this.GetAgents.bind(this);
+  }
+  GetAgents(request: GetAgentsRequest): Promise<GetAgentsResponse> {
+    const data = GetAgentsRequest.encode(request).finish();
+    const promise = this.rpc.request(this.service, "GetAgents", data);
+    return promise.then((data) => GetAgentsResponse.decode(new BinaryReader(data)));
+  }
+}
 
 export interface BillingService {
   GetBilling(request: GetBillingRequest): Promise<GetBillingResponse>;

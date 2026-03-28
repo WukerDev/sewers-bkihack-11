@@ -18,7 +18,7 @@
 
     <v-row>
       <v-col
-        v-for="agent in store.deployedAgents"
+        v-for="agent in config.deployedAgents"
         :key="agent.id"
         cols="12"
         md="4"
@@ -64,7 +64,7 @@
         </h2>
 
         <v-card
-          v-for="temp in store.agentTemplates"
+v-for="temp in config.agentTemplates"
           :key="temp.name"
           class="template-card mb-4 pa-4 d-flex align-center"
           @click="confirmHire(temp)"
@@ -90,18 +90,19 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { useAgentStore } from "./store";
+import {useConfigStore} from "../../core/config.ts";
 
 const store = useAgentStore();
 const drawer = ref(false);
+const config = useConfigStore();
 
 const confirmHire = (template: any) => {
   store.hireAgent(template);
-  drawer.value = false; // Zamknij po wyborze
+  drawer.value = false;
 };
 </script>
 
 <style scoped>
-/* TYPOGRAFIA FRUTIGER */
 .aero-text-gradient {
   background: linear-gradient(to bottom, #034d77, #0284c7);
   -webkit-background-clip: text;

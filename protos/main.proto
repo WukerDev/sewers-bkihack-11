@@ -2,8 +2,6 @@ syntax = "proto3";
 
 package sewers;
 
-
-
 message Gpu{
 string id = 1;
 string model = 2;
@@ -22,18 +20,34 @@ double temperature = 5;
 int32 threads_usage = 6;
 }
 
+message DailyWindow {
+  google.protobuf.Duration window_start = 1;
+  google.protobuf.Duration window_end = 2;
+}
+
+message WindowSchedule {
+  DailyWindow monday = 1;
+  DailyWindow tuesday = 2;
+  DailyWindow wednesday = 3;
+  DailyWindow thursday = 4;
+  DailyWindow friday = 5;
+  DailyWindow saturday = 6;
+  DailyWindow sunday = 7;
+}
+
 message Manhole {
   string id = 1;
-
-  repeated Cpu cpus = 2;
-  repeated Gpu gpus = 3;
-  string ram = 4;
-
-  double price_per_tflops = 5;
-
-
-  string status = 6;
-
+  string name = 2;
+  string owner_id = 3;
+  Company owner = 4;
+  repeated Gpu gpus = 5;
+  repeated Cpu cpus = 6;
+  double ram = 7;
+  WindowSchedule window_schedule = 8;
+  double city_longitude = 9;
+  double city_latitude = 10;
+  double price_per_teraflop = 11;
+  string address = 12;
 }
 
 message Company {
@@ -171,6 +185,66 @@ message GetBillingResponse {
   double hourly_rate = 3;
   repeated double daily_spending = 4;
   repeated int32 resource_usage = 5;
+}
+
+message ApiKey {
+  string id = 1;
+  string name = 2;
+  string key = 3;
+  string created_at = 4;
+}
+
+message GetApiKeysRequest {}
+
+message GetApiKeysResponse {
+  repeated ApiKey keys = 1;
+}
+
+service ApiService {
+  rpc GetApiKeys (GetApiKeysRequest) returns (GetApiKeysResponse);
+}
+
+message ProviderNode {
+  string id = 1;
+  string name = 2;
+  string uptime = 3;
+  string power_usage = 4;
+  string vram_usage = 5;
+  string gpu_temp = 6;
+  string cpu_usage = 7;
+  string net_latency = 8;
+  string status = 9;
+}
+
+message GetNodesRequest {}
+
+message GetNodesResponse {
+  repeated ProviderNode nodes = 1;
+}
+
+service ProviderService {
+  rpc GetNodes (GetNodesRequest) returns (GetNodesResponse);
+}
+import "google/protobuf/duration.proto";
+
+message Agent {
+  string id = 1;
+  string name = 2;
+  string specialization = 3;
+  string status = 4;
+  double monthly_cost = 5;
+  string node = 6;
+  string avatar = 7;
+}
+
+message GetAgentsRequest {}
+
+message GetAgentsResponse {
+  repeated Agent agents = 1;
+}
+
+service AgentService {
+  rpc GetAgents (GetAgentsRequest) returns (GetAgentsResponse);
 }
 
 service BillingService {
