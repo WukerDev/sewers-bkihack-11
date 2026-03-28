@@ -2,7 +2,7 @@
   <v-container class="py-8 relative-top" style="max-width: 1200px">
     <div class="d-flex align-center mb-8">
       <div>
-        <h1 class="text-h4 font-weight-black aero-text-gradient">Agenci AI</h1>
+        <h1 class="text-h4 agent-text font-weight-black">Agenci AI</h1>
       </div>
       <v-spacer></v-spacer>
       <v-btn
@@ -64,7 +64,7 @@
         </h2>
 
         <v-card
-v-for="temp in config.agentTemplates"
+          v-for="temp in config.agentTemplates"
           :key="temp.name"
           class="template-card mb-4 pa-4 d-flex align-center"
           @click="confirmHire(temp)"
@@ -90,7 +90,7 @@ v-for="temp in config.agentTemplates"
 <script setup lang="ts">
 import { ref } from "vue";
 import { useAgentStore } from "./store";
-import {useConfigStore} from "../../core/config.ts";
+import { useConfigStore } from "../../core/config.ts";
 
 const store = useAgentStore();
 const drawer = ref(false);
@@ -109,7 +109,9 @@ const confirmHire = (template: any) => {
   -webkit-text-fill-color: transparent;
   font-size: 2.5rem !important;
 }
-
+.agent-text {
+  color: #f0f0f0;
+}
 .agent-name {
   font-size: 1.4rem;
   font-weight: 900;

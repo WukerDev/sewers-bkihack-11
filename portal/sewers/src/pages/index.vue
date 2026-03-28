@@ -108,7 +108,6 @@
 </template>
 <style scoped>
 .aero-main-bg {
-  background: #f0f9ff;
   min-height: 100vh;
   position: relative;
   overflow: hidden;
@@ -116,6 +115,7 @@
 
 .hero-gradient {
   background: linear-gradient(135deg, #0284c7 0%, #0369a1 50%, #075985 100%);
+  opacity: 0.9;
   border-bottom: 5px solid #0ea5e9;
   position: relative;
 }

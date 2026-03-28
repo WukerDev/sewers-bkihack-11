@@ -204,7 +204,6 @@ Authorization: Bearer sk-your-key</pre
 <style scoped>
 /* --- CENTROWANIE I TŁO --- */
 .aero-main-container {
-  background: radial-gradient(circle at 50% -20%, #f0f9ff 0%, #cbd5e1 100%);
   min-height: 100vh; /* Wymusza wysokość na całe okno */
   width: 100%;
 }

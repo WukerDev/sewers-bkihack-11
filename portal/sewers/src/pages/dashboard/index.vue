@@ -255,7 +255,6 @@ watch(
 <style scoped>
 /* BACKGROUND GŁÓWNY */
 .aero-main-container {
-  background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
   height: 100vh;
 }
 

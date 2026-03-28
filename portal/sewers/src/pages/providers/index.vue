@@ -65,7 +65,7 @@ function getStatusColor(status: string) {
 </script>
 
 <template>
-  <v-container fluid class="aero-bg">
+  <v-container fluid>
     <v-row>
       <v-col cols="12">
         <v-card class="aero-glass pa-4 mb-6 d-flex align-center flex-wrap">
@@ -73,7 +73,7 @@ function getStatusColor(status: string) {
             <v-icon color="primary" size="x-large">mdi-office-building</v-icon>
           </v-avatar>
           <div>
-            <v-card-title class="text-h4 font-weight-bold aero-title-text mb-0">
+            <v-card-title class="text-h4 font-weight-bold mb-0">
               Panel Dostawcy
             </v-card-title>
             <v-card-subtitle class="text-subtitle-1 pb-2">
@@ -211,7 +211,7 @@ function getStatusColor(status: string) {
 
         <v-row class="mt-4">
           <v-col cols="12" md="6">
-            <v-card class="aero-glass pa-4 h-100">
+            <v-card class="aero-panel pa-4 h-100">
               <v-card-title class="aero-title-text px-0 pb-1">
                 <v-icon start color="warning">mdi-lightning-bolt</v-icon>
                 Sumaryczny Pobór Mocy
@@ -237,7 +237,7 @@ function getStatusColor(status: string) {
           </v-col>
 
           <v-col cols="12" md="6">
-            <v-card class="aero-glass pa-4 h-100">
+            <v-card class="aero-panel pa-4 h-100">
               <v-card-title class="aero-title-text px-0 pb-1">
                 <v-icon start color="info">mdi-memory</v-icon> Utylizacja
                 Pamięci VRAM
@@ -262,7 +262,7 @@ function getStatusColor(status: string) {
           </v-col>
         </v-row>
 
-        <v-card class="aero-glass mt-8 shadow-lg">
+        <v-card class="aero-panel mt-8 shadow-lg">
           <v-tabs
             v-model="activeTab"
             bg-color="transparent"
