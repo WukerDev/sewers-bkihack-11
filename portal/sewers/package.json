@@ -12,13 +12,14 @@
     "lint": "eslint",
     "lint:fix": "eslint --fix",
     "mcp": "ruler apply",
-    "mcp:revert": "ruler revert"
-  },
+    "mcp:revert": "ruler revert",
+"generate": "protoc --plugin=protoc-gen-ts_proto=.\\node_modules\\.bin\\protoc-gen-ts_proto.cmd --ts_proto_out=./src/proto -I ../../protos ../../protos/main.proto --ts_proto_opt=esModuleInterop=true" },
   "dependencies": {
     "@fontsource/roboto": "^5.2.10",
     "@mdi/font": "7.4.47",
     "leaflet": "^1.9.4",
     "pinia": "^3.0.4",
+    "ts-proto": "^2.11.6",
     "vue": "^3.5.30",
     "vue-i18n": "^11.3.0",
     "vue-router": "^4.6.4",

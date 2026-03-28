@@ -138,5 +138,14 @@ export const useConfigStore = defineStore('config', () => {
   ])
 
 
-  return { taskList, taskTypes, availableModels, metrics, metricsConfig, clusters }
+    const currentUser = ref({
+  id: 'u-782',
+  name: 'Admin',
+  avatar: 'https://9611ebabdd7aa7a3c429-608cd691ca2791bf39ae82b0c902da1a.ssl.cf1.rackcdn.com/0-Betsy_redo_3.jpg',
+  role: 'admin',
+  balance: 1450.50,
+  currency: 'PLN'
+})
+
+  return { taskList, taskTypes, availableModels, metrics, metricsConfig, clusters, currentUser }
 })
