@@ -3,39 +3,38 @@ package manhole;
 
 message Empty {}
 
-// 1. DANE STATYCZNE (Wysyłane raz na początku)
+message GpuStatic {
+    int32 gpu_id = 1;
+    uint64 total_vram_bytes = 2;
+}
+
 message HardwareStaticInfo {
     string node_id = 1;
     uint64 total_ram_bytes = 2;
-    int32 cpu_count = 3;
-    int32 gpu_count = 4;
+    int32 cpu_sockets_count = 3;
+    repeated GpuStatic gpus = 4;
 }
 
-// 2. DANE DYNAMICZNE (Strumieniowane co sekundę)
 message CpuDynamic {
     int32 cpu_id = 1;
-    double usage_percent = 2;
+    double usage_percent = 2; // Średnia z całej sztuki
     double temperature = 3;
 }
 
 message GpuDynamic {
     int32 gpu_id = 1;
-    double vram_used_bytes = 2;
-    double load_percent = 3;
-    double temperature = 4;
+    uint64 vram_used_bytes = 2;
+    double temperature = 3;
 }
 
 message DynamicStatsResponse {
-    string status = 1; // "free" / "busy"
+    string status = 1;
     uint64 ram_used_bytes = 2;
     repeated CpuDynamic cpus = 3;
     repeated GpuDynamic gpus = 4;
 }
 
 service NodeMonitor {
-    // Pobierz konfigurację sprzętową (wywołaj raz)
     rpc GetHardwareStaticInfo (Empty) returns (HardwareStaticInfo);
-    
-    // Subskrybuj strumień statystyk (wywołuj co sekundę)
     rpc StreamDynamicStats (Empty) returns (stream DynamicStatsResponse);
 }

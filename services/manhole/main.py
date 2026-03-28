@@ -17,12 +17,20 @@ class NodeMonitorServicer(manhole_pb2_grpc.NodeMonitorServicer):
         logging.info(f"📊 Mózg prosi o dane statystyczne węzła {NODE_ID}")
         stats = hardware.get_full_stats()
         
-        return manhole_pb2.HardwareStaticInfo(
+        # Tworzymy obiekt odpowiedzi
+        response = manhole_pb2.HardwareStaticInfo(
             node_id=NODE_ID,
-            total_ram_bytes=stats['total_ram'], # hardware.py musi to zwracać
-            cpu_count=len(stats['cpus']),
-            gpu_count=len(stats['gpus'])
+            total_ram_bytes=int(stats['total_ram']),
+            cpu_sockets_count=len(stats['cpus']) # ZMIANA: dopasowanie do .proto
         )
+        
+        # Dodajemy statyczne info o każdej karcie GPU (np. jej Max VRAM)
+        for g in stats['gpus']:
+            gpu_static = response.gpus.add()
+            gpu_static.gpu_id = g['gpu_id']
+            gpu_static.total_vram_bytes = int(g['vram_total_bytes'])
+            
+        return response
 
     def StreamDynamicStats(self, request, context):
         """Strumieniuje zużycie co sekundę."""
@@ -32,29 +40,31 @@ class NodeMonitorServicer(manhole_pb2_grpc.NodeMonitorServicer):
             try:
                 stats = hardware.get_full_stats()
                 
+                # Budujemy odpowiedź - sprawdź czy pola pasują do .proto!
                 response = manhole_pb2.DynamicStatsResponse(
                     status=NODE_STATUS,
-                    ram_used_bytes=stats['ram_used_bytes'] # hardware.py musi to zwracać
+                    ram_used_bytes=int(stats['ram_used_bytes'])
                 )
                 
+                # CPU - używamy usage_percent zgodnie z Twoim .proto
                 for c in stats['cpus']:
-                    cpu_item = response.cpus.add()
-                    cpu_item.cpu_id = c['cpu_id']
-                    cpu_item.usage_percent = c['thread_usage'] # To jest teraz średnia z socketu
-                    cpu_item.temperature = c['temperature']
+                    cpu = response.cpus.add()
+                    cpu.cpu_id = c['cpu_id']
+                    cpu.usage_percent = float(c['thread_usage']) # Sprawdź czy w .proto jest usage_percent!
+                    cpu.temperature = float(c['temperature'])
 
+                # GPU - używamy vram_used_bytes i temperature
                 for g in stats['gpus']:
                     gpu = response.gpus.add()
                     gpu.gpu_id = g['gpu_id']
-                    gpu.vram_used_bytes = g['vram_used_bytes']
-                    gpu.load_percent = g['load_percent'] # potrzebne w hardware.py
-                    gpu.temperature = g['temperature']
+                    gpu.vram_used_bytes = int(g['vram_used_bytes'])
+                    gpu.temperature = float(g['temperature'])
 
                 yield response
-                time.sleep(1) # Dokładnie co sekundę
+                time.sleep(1)
                 
             except Exception as e:
-                logging.error(f"❌ Błąd: {e}")
+                logging.error(f"❌ Błąd w pętli serwera: {e}")
                 break
 
 def main():

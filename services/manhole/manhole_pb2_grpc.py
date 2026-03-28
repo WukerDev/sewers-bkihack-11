@@ -50,15 +50,13 @@ class NodeMonitorServicer(object):
     """Missing associated documentation comment in .proto file."""
 
     def GetHardwareStaticInfo(self, request, context):
-        """Pobierz konfigurację sprzętową (wywołaj raz)
-        """
+        """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
     def StreamDynamicStats(self, request, context):
-        """Subskrybuj strumień statystyk (wywołuj co sekundę)
-        """
+        """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
