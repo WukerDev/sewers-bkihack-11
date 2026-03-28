@@ -13,23 +13,25 @@ NODE_STATUS = "free"
 class NodeMonitorServicer(manhole_pb2_grpc.NodeMonitorServicer):
     
     def GetHardwareStaticInfo(self, request, context):
-        """Wysyła info o sprzęcie raz na prośbę klienta."""
-        logging.info(f"📊 Mózg prosi o dane statystyczne węzła {NODE_ID}")
         stats = hardware.get_full_stats()
-        
-        # Tworzymy obiekt odpowiedzi
         response = manhole_pb2.HardwareStaticInfo(
             node_id=NODE_ID,
-            total_ram_bytes=int(stats['total_ram']),
-            cpu_sockets_count=len(stats['cpus']) # ZMIANA: dopasowanie do .proto
+            total_ram_bytes=int(stats['total_ram'])
         )
-        
-        # Dodajemy statyczne info o każdej karcie GPU (np. jej Max VRAM)
+
+        for c in stats['cpus']:
+            cpu = response.cpus.add()
+            cpu.cpu_id = c['cpu_id']
+            cpu.model = c['model']
+            cpu.threads = c['threads']
+
         for g in stats['gpus']:
-            gpu_static = response.gpus.add()
-            gpu_static.gpu_id = g['gpu_id']
-            gpu_static.total_vram_bytes = int(g['vram_total_bytes'])
-            
+            gpu = response.gpus.add()
+            gpu.gpu_id = g['gpu_id']
+            gpu.model = g['model']
+            # Konwersja na GB (double) dla klasy Gpu w C#
+            gpu.vram_gb = g['vram_total_bytes'] / (1024**3)
+
         return response
 
     def StreamDynamicStats(self, request, context):
@@ -71,9 +73,10 @@ def main():
     logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(message)s')
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     manhole_pb2_grpc.add_NodeMonitorServicer_to_server(NodeMonitorServicer(), server)
-    server.add_insecure_port('[::]:13000')
+    port = 15000
+    server.add_insecure_port(f'[::]:{port}')
     server.start()
-    logging.info("🚀 Serwer Manhole gotowy na porcie 13000")
+    logging.info(f"🚀 Serwer Manhole gotowy na porcie {port}")
     server.wait_for_termination()
 
 if __name__ == "__main__":

@@ -4,14 +4,21 @@ package manhole;
 message Empty {}
 
 message GpuStatic {
-    int32 gpu_id = 1;
-    uint64 total_vram_bytes = 2;
+    int32 gpu_id = 1;      // Id liczone od 0
+    string model = 2;      // np. "NVIDIA GeForce RTX 3060"
+    double vram_gb = 3;    // W GB, zgodnie z Twoją klasą C# (double Vram)
+}
+
+message CpuStatic {
+    int32 cpu_id = 1;      // Id liczone od 0
+    string model = 2;      // np. "Intel(R) Core(TM) i7-10750H"
+    int32 threads = 3;     // Łączna liczba wątków tej sztuki procesora
 }
 
 message HardwareStaticInfo {
     string node_id = 1;
     uint64 total_ram_bytes = 2;
-    int32 cpu_sockets_count = 3;
+    repeated CpuStatic cpus = 3;
     repeated GpuStatic gpus = 4;
 }
 

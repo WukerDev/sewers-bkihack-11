@@ -9,15 +9,20 @@ def format_bytes(b):
         b /= 1024
 
 def run():
-    with grpc.insecure_channel('localhost:13000') as channel:
+    with grpc.insecure_channel('localhost:15000') as channel:
         stub = manhole_pb2_grpc.NodeMonitorStub(channel)
         
         print("📥 Pobieram dane sprzętowe...")
         hw = stub.GetHardwareStaticInfo(manhole_pb2.Empty())
         print(f"✅ Węzeł: {hw.node_id}")
-        print(f"💻 Sprzęt: {hw.cpu_sockets_count} szt. CPU | {len(hw.gpus)} szt. GPU | RAM: {format_bytes(hw.total_ram_bytes)}")
+        
+        # Wyświetlanie zgodnie z Twoimi klasami C#
+        for c in hw.cpus:
+            print(f"💻 CPU {c.cpu_id}: {c.model} | Wątki: {c.threads}")
+            
         for g in hw.gpus:
-            print(f"   └─ GPU {g.gpu_id} VRAM Max: {format_bytes(g.total_vram_bytes)}")
+            print(f"🎮 GPU {g.gpu_id}: {g.model} | VRAM: {g.vram_gb:.2f} GB")
+            
         print("-" * 50)
 
         print("📡 Monitoring dynamiczny...")
