@@ -17,6 +17,7 @@ public class Manhole
     
     public double CityLongitude { get; set; }
     public double CityLatitude { get; set; }
+    public string CityName { get; set; } = string.Empty;
     public double PricePerTeraflop { get; set; }
     public string Address { get; set; } = string.Empty;
 }

@@ -1,9 +1,10 @@
-﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Configuration;
-using System;
+﻿using Microsoft.EntityFrameworkCore;
 using DefaultNamespace;
+using DefaultNamespace.Controllers;
+using sewers.Application.State;
+using Sewers.Main.Generated;
+using SlimMessageBus.Host;
+using SlimMessageBus.Host.Memory;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,6 +28,14 @@ builder.Services.AddCors(o => o.AddPolicy("AllowAll", builder =>
         .WithExposedHeaders("Grpc-Status", "Grpc-Message", "Grpc-Encoding", "Grpc-Accept-Encoding");
 }));
 
+builder.Services.AddSingleton<DashboardServiceController>();
+builder.Services.AddSingleton<ApplicationState>();
+
+builder.Services.AddSlimMessageBus(mbb =>
+{
+    mbb.WithProviderMemory(); 
+});
+
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
@@ -41,7 +50,7 @@ app.UseCors("AllowAll");
 
 app.UseGrpcWeb(new GrpcWebOptions { DefaultEnabled = true });
 
-// app.MapGrpcService<TwojSerwisGrpc>().EnableGrpcWeb();
+app.MapGrpcService<DashboardServiceController>().EnableGrpcWeb();
 
 app.MapGet("/status", () => "I'm alive!");
 

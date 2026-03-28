@@ -1,7 +1,7 @@
 syntax = "proto3";
 package  manhole;
 
-option csharp_namespace = "Sewers.ManholeGenerated";
+option csharp_namespace = "Sewers.Manhole.Generated";
 
 message CpuUsageInfo {
     int32 cpu_id = 1;

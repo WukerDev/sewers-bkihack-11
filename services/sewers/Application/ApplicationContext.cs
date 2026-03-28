@@ -5,7 +5,7 @@ namespace DefaultNamespace;
 
 public class ApplicationContext : DbContext
 {
-    public DbSet<Manhole> Manholes { get; set; } = null!;
+    public DbSet<sewers.Model.Manhole> Manholes { get; set; } = null!;
     public DbSet<Company> Companies { get; set; } = null!;
 
     public ApplicationContext(DbContextOptions<ApplicationContext> options) : base(options)
@@ -22,7 +22,7 @@ public class ApplicationContext : DbContext
             .HasForeignKey(m => m.OwnerId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        modelBuilder.Entity<Manhole>(entity =>
+        modelBuilder.Entity<sewers.Model.Manhole>(entity =>
         {
             entity.HasMany(m => m.GPUs)
                 .WithOne(g => g.Manhole)

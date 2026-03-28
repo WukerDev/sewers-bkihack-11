@@ -1,6 +1,31 @@
 syntax = "proto3";
+option csharp_namespace = "Sewers.Main.Generated";
 
 package sewers;
+
+
+message ManholePreview{
+  string id = 1;
+  string name = 2;
+  string company_name = 3;
+  string status = 4;
+  string city_name = 5;
+}
+
+message GetManholesRequest{
+}
+
+message GetManholesResponse{
+  repeated ManholePreview manholes = 1;
+}
+
+message GetManholeDetailsRequest{
+  string manhole_id = 1;
+}
+
+message GetManholeDetailsResponse{
+  Manhole manhole = 1;
+}
 
 message Gpu{
 string id = 1;
@@ -21,8 +46,8 @@ int32 threads_usage = 6;
 }
 
 message DailyWindow {
-  google.protobuf.Duration window_start = 1;
-  google.protobuf.Duration window_end = 2;
+  string window_start = 1;
+  string window_end = 2;
 }
 
 message WindowSchedule {
@@ -55,15 +80,6 @@ message Company {
   string name = 2;
   string status = 3;
   repeated Manhole manholes = 4;
-}
-
-message Cluster {
-  string id = 1;
-  string name = 2;
-  double lat = 3;
-  double lng = 4;
-  string status = 5;
-  repeated Company companies = 6;
 }
 
 message User {
@@ -103,7 +119,6 @@ message GetConfigRequest {}
 
 message ConfigResponse {
   Metrics metrics = 1;
-  repeated Cluster clusters = 2;
   User current_user = 3;
   repeated TaskType task_types = 4;
   repeated string available_models = 5;
@@ -252,7 +267,8 @@ service BillingService {
 }
 
 service DashboardService {
-  rpc GetConfig (GetConfigRequest) returns (ConfigResponse);
+  rpc GetManholes (GetManholesRequest) returns (GetManholesResponse);
+  rpc GetManholeDetails (GetManholeDetailsRequest) returns (GetManholeDetailsResponse);
   rpc StreamMetrics (GetConfigRequest) returns (stream Metrics);
 }
 

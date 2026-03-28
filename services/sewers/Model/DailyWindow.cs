@@ -2,6 +2,6 @@ namespace sewers.Model;
 
 public class DailyWindow
 {
-    public TimeSpan WindowStart { get; set; }
-    public TimeSpan WindowEnd { get; set; }
+    public string WindowStart { get; set; }
+    public string WindowEnd { get; set; }
 }
