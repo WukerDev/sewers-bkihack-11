@@ -57,9 +57,6 @@ const copy = async (text: string) => {
             <v-tab value="keys">
               <v-icon start size="small">mdi-key-chain</v-icon>Klucze API
             </v-tab>
-            <v-tab value="docs">
-              <v-icon start size="small">mdi-file-code</v-icon>Dokumentacja
-            </v-tab>
           </v-tabs>
 
           <v-window v-model="tab" class="flex-grow-1">

@@ -56,7 +56,8 @@ export interface Manhole {
   windowSchedule: WindowSchedule | undefined;
   cityLongitude: number;
   cityLatitude: number;
-  pricePerTeraflop: number;
+  pricePerTeraflopDay: number;
+  pricePerTeraflopNight: number;
   address: string;
 }
 
