@@ -94,7 +94,7 @@ const newKeyName = ref('')
 const handleCreateKey = () => {
   apiStore.createKey(newKeyName.value)
   newKeyName.value = ''
-  showAddKey.ref = false
+  showAddKey.value = false
 }
 
 const copy = (text: string) => {
