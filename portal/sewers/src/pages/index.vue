@@ -213,14 +213,46 @@
   height: 80px;
   margin: 0 auto;
   border-radius: 50%;
+  position: relative;
+
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow:
-    0 10px 20px rgba(0, 0, 0, 0.1),
-    inset 0 -5px 10px rgba(0, 0, 0, 0.2);
-}
 
+  /* Core sphere lighting */
+  background: radial-gradient(
+    circle at 30% 30%,
+    rgba(255, 255, 255, 1) 0%,
+    rgba(255, 255, 255, 0.8) 10%,
+    rgba(180, 180, 180, 0.6) 25%,
+    rgba(80, 80, 80, 0.7) 60%,
+    rgba(20, 20, 20, 1) 100%
+  );
+
+  /* Glow + depth */
+  box-shadow:
+    0 0 15px rgba(255, 255, 255, 0.6),
+    /* tight glow */ 0 0 40px rgba(255, 255, 255, 0.4),
+    /* medium glow */ 0 0 80px rgba(255, 255, 255, 0.25),
+    /* outer glow */ inset 0 -15px 20px rgba(0, 0, 0, 0.6),
+    inset 0 8px 15px rgba(255, 255, 255, 0.6);
+}
+.icon-sphere::after {
+  content: "";
+  position: absolute;
+  top: 8%;
+  left: 18%;
+  width: 45%;
+  height: 30%;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.95) 0%,
+    rgba(255, 255, 255, 0.4) 60%,
+    transparent 100%
+  );
+  filter: blur(3px);
+}
 .bg-green {
   background: radial-gradient(circle at 30% 30%, #4ade80, #16a34a);
 }
