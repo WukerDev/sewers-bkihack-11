@@ -222,6 +222,27 @@ export const useConfigStore = defineStore('config', () => {
     }
   }
 
+    const invoices = ref([
+    {
+      id: "INV-2026-02",
+      date: "2026-02-28",
+      amount: 1420.0,
+      status: "Opłacona",
+    },
+    {
+      id: "INV-2026-01",
+      date: "2026-01-31",
+      amount: 1150.2,
+      status: "Opłacona",
+    },
+  ]);
+
+    const currentMonthSpending = ref(502.5);
+  const hourlyRate = ref(4.25); // Ile wydajemy na godzinę (PLN/h)
+
+  const dailySpending = ref([42, 38, 45, 50, 48, 60, 55, 62, 58, 65]);
+  const resourceUsage = ref([85, 72, 90]); // CPU, GPU, RAM w %
+
   // Inicjalizacja przy załadowaniu Store'a
   fetchConfigData()
   fetchTasks()
@@ -239,6 +260,12 @@ export const useConfigStore = defineStore('config', () => {
     removeTask,
     pauseTask,
     stopTask,
-    editTask
+    editTask,
+      invoices,
+      currentMonthSpending,
+      hourlyRate,
+      dailySpending,
+      resourceUsage
+
   }
 })

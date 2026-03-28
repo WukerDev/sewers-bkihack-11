@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { onMounted } from "vue";
 import { useBillingStore } from "./store";
+import {useConfigStore} from "../../core/config";
 
 const store = useBillingStore();
-
+const config = useConfigStore();
 onMounted(() => {
   store.startLiveCounter();
 });
@@ -24,7 +25,7 @@ onMounted(() => {
               <div
                 class="text-headline-small font-weight-black aero-text-gradient"
               >
-                {{ store.currentMonthSpending.toFixed(2) }}
+                {{ config.currentMonthSpending.toFixed(2) }}
                 <span class="text-h4">PLN</span>
               </div>
               <v-icon
@@ -37,7 +38,7 @@ onMounted(() => {
             <div
               class="text-caption text-secondary font-weight-bold d-flex align-center mt-2"
             >
-              Aktualne tempo: {{ store.hourlyRate }} PLN / h
+              Aktualne tempo: {{ config.hourlyRate }} PLN / h
             </div>
           </div>
         </v-card>
@@ -61,12 +62,12 @@ onMounted(() => {
                 class="d-flex justify-space-between text-caption font-weight-black mb-1"
               >
                 <span>{{ val }}</span>
-                <span class="text-primary">{{ store.resourceUsage[i] }}%</span>
+                <span class="text-primary">{{ config.resourceUsage[i] }}%</span>
               </div>
               <div class="aero-progress-container">
                 <div
                   class="aero-progress-bar"
-                  :style="{ width: store.resourceUsage[i] + '%' }"
+                  :style="{ width: config.resourceUsage[i] + '%' }"
                 ></div>
               </div>
             </div>
@@ -79,7 +80,7 @@ onMounted(() => {
       <div class="gloss-overlay"></div>
       <div class="section-label mb-4">Trend Wydatków</div>
       <v-sparkline
-        :model-value="store.dailySpending"
+        :model-value="config.dailySpending"
         color="#0078d4"
         height="80"
         padding="20"
@@ -104,7 +105,7 @@ onMounted(() => {
         </thead>
         <tbody>
           <tr
-            v-for="invoice in store.invoices"
+            v-for="invoice in config.invoices"
             :key="invoice.id"
             class="aero-tr"
           >
