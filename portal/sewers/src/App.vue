@@ -57,7 +57,7 @@ import GlobalContextMenu from "./components/GlobalContextMenu.vue";
 import { ref } from "vue";
 
 const links = ref([
-  { title: "Start", to: "/" },
+  { title: "Platforma", to: "/" },
   { title: "Dashboard", to: "/dashboard" },
   { title: "Taski", to: "/tasks" },
   { title: "Agenci AI", to: "/agents" },
