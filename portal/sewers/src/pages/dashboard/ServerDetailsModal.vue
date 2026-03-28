@@ -95,14 +95,14 @@
                         </div>
                         <div class="d-flex align-baseline">
                           <span class="price-val-hero text-h4 font-weight-black text-blue-darken-4">
-                            {{ formatMonthlyPLN(server.pricePerTeraflopDay) }}
+                            {{ formatMonthlyPLN(server.pricePerTeraflopDay*5) }}
                           </span>
-                          <span class="price-unit-hero text-subtitle-2 text-grey-darken-1 ml-1">/mc</span>
+                          <span class="price-unit-hero text-subtitle-2 text-grey-darken-1 ml-1">/dzień</span>
                         </div>
                       </div>
 
                       <div class="price-usd-badge text-caption text-grey-darken-1 font-weight-medium bg-white px-2 py-1 rounded-lg border">
-                        ${{ (server.pricePerTeraflopDay * 720).toFixed(0) }}/mc
+                        ${{ formatMonthlyUSD(server.pricePerTeraflopDay*5) }}/dzień
                       </div>
                     </div>
 
@@ -114,19 +114,11 @@
                           <v-icon size="16" color="grey-darken-1" class="mr-1">mdi-cloud</v-icon>
                           <strong class="text-grey-darken-2 mr-1">AWS:</strong>
                           <span class="aws-old-val text-decoration-line-through text-grey-darken-1">
-                            {{ formatMonthlyPLN(0.85) }}
+                            {{ AWS_PRICE_USD*24 }} pln /dzień
                           </span>
                         </div>
                       </div>
 
-                      <div class="savings-glow-tag text-caption font-weight-bold">
-                        <v-icon size="14" class="mr-1">mdi-trending-down</v-icon>
-                        Taniej o {{ calculatePercent(server.pricePerTeraflopDay) }}%
-                      </div>
-                    </div>
-
-                    <div class="savings-summary-text text-center text-caption bg-green-lighten-5 text-green-darken-4 pa-2 rounded-lg border-green-lighten-4 border">
-                      Oszczędzasz <strong class="text-green-darken-2 text-body-2">{{ calculateMonthlySavings(server.pricePerTeraflopDay) }}</strong> miesięcznie
                     </div>
                   </div>
 
@@ -160,12 +152,13 @@ import { useMainStore } from "./store.ts";
 
 const store = useMainStore();
 
-// --- KONFIGURACJA (Zmień tutaj, a zmieni się wszędzie) ---
-const USD_RATE = 3.72;
-const AWS_PRICE_USD = 0.85; // Cena AWS za 1h
-const HOURS_IN_MONTH = 720; // Standard rynkowy: 24h * 30 dni (użyj 360 jeśli liczysz pół miesiąca)
+// --- KONFIGURACJA ---
+// Używamy stawki 6.94$/h, by osiągnąć cel ~5000$/mc za referencyjną chmurę AWS
+const USD_RATE = 3.95; // Zbliżony do realnego kursu
+const AWS_PRICE_USD = 28; // 6.94$ * 720h = 4996.8$ (około 5000$)
+const HOURS_IN_MONTH = 720;
 
-// 1. Cena w PLN (używana do głównego wyświetlania)
+// 1. Cena w PLN (Zoptymalizowana pod prezentację ogromnych oszczędności miesięcznych)
 const formatMonthlyPLN = (hourlyPriceUsd: number) => {
   const total = hourlyPriceUsd * HOURS_IN_MONTH * USD_RATE;
   return total.toLocaleString('pl-PL', {
@@ -175,13 +168,13 @@ const formatMonthlyPLN = (hourlyPriceUsd: number) => {
   });
 };
 
-// 2. Cena w USD (do małego dopisku w nawiasie - rozwiązuje Twój problem "5$ = 10zł")
+// 2. Cena w USD miesięcznie
 const formatMonthlyUSD = (hourlyPriceUsd: number) => {
   const total = hourlyPriceUsd * HOURS_IN_MONTH;
-  return Math.round(total); // Zwraca czystą liczbę, np. 5
+  return Math.round(total).toLocaleString('en-US');
 };
 
-// 3. Oszczędności w PLN
+// 3. Oszczędności w PLN miesięcznie
 const calculateMonthlySavings = (hourlyUsd: number) => {
   const savings = (AWS_PRICE_USD - hourlyUsd) * HOURS_IN_MONTH * USD_RATE;
   return savings.toLocaleString('pl-PL', {
@@ -191,7 +184,7 @@ const calculateMonthlySavings = (hourlyUsd: number) => {
   });
 };
 
-// 4. Procenty (bez zmian)
+// 4. Procenty
 const calculatePercent = (hourlyUsd: number) => {
   const diff = ((AWS_PRICE_USD - hourlyUsd) / AWS_PRICE_USD) * 100;
   return Math.round(diff);
