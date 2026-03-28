@@ -1307,10 +1307,15 @@ export const useConfigStore = defineStore("config", () => {
   const providerToken = ref<string>("sk-prov-9876543210abcdef");
   const monthlyEarnings = ref<number>(12450.75);
 
-  const historicalEarnings = Array.from({ length: 7 }, (_, i) => ({
-    day: i + 1,
-    amount: monthlyEarnings.value * (1 + (Math.random() - 0.5) * 0.1),
-  }));
+  const historicalEarnings = [
+    { day: "Pon", amount: 13500 },
+    { day: "Wt", amount: 14800 },
+    { day: "Śr", amount: 13900 },
+    { day: "Czw", amount: 15200 },
+    { day: "Pt", amount: 14100 },
+    { day: "Sob", amount: 13200 },
+    { day: "Nd", amount: 14500 },
+  ];
   const historicalLatency = Array.from({ length: 7 }, (_, i) => ({
     day: i + 1,
     latency: 4 + Math.random() * 4,
