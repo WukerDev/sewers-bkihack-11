@@ -48,6 +48,8 @@ message Manhole {
   double city_latitude = 10;
   double price_per_teraflop = 11;
   string address = 12;
+  double price_per_teraflop_day = 13;
+  double price_per_teraflop_night = 14;
 }
 
 message Company {
