@@ -1,0 +1,26 @@
+Struktura:
+
+manhole/
+├── main.py              # Punkt wejścia, pętla główna i komunikacja z API
+├── config.py            # Odczytywanie zmiennych środowiskowych (API_KEY, URL)
+├── hardware.py          # Logika sprawdzania GPU (biblioteka pynvml)
+├── docker_orchestrator.py # Zarządzanie kontenerami zadań (Docker SDK)
+├── storage.py           # Pobieranie datasetów i upload wyników
+├── requirements.txt     # docker, pynvml, requests, pyyaml
+└── Dockerfile           # Instrukcja budowania obrazu Manhole
+
+
+Połączenia Manhole z resztą systemu
+
+    Manhole ↔ Orchestrator (Brain):
+        Heartbeat (Out): Raz na 30s wysyłasz binarne bajty (.proto). Orchestrator na ich podstawie aktualizuje mapę i liczniki VRAM na dashboardzie.
+        Polling (In): Co 10s pytasz o nowe zadania (YAML/JSON).
+
+    Manhole ↔ Docker Engine (Local):
+        Twój kod steruje lokalnym demonem Dockera przez gniazdo /var/run/docker.sock. Tworzysz kontenery, stopujesz je i czytasz ich logi.
+
+    Manhole ↔ Storage (S3/MinIO/HTTP):
+        Pobierasz dane wejściowe (Datasets) i wysyłasz gotowe modele (.safetensors / .bin).
+
+    Kontener Zadania ↔ Dane Lokalne:
+        Poprzez Volume Mounts. Kontener AI nie widzi sieci, widzi tylko folder /app/data zamontowany przez Ciebie.

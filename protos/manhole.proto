@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+message CpuInfo {
+    int32 cpu_id = 1;
+    int32 thread_usage = 2; // w %
+    double temperature = 3;
+}
+
+message GpuInfo {
+    int32 gpu_id = 1;
+    double vram_usage = 2; // w % lub MB
+    double temperature = 3;
+}
+
+message Heartbeat {
+    bool status = 1;
+    repeated CpuInfo cpus = 2;
+    repeated GpuInfo gpus = 3;
+    double ram_usage = 4; // w %
+}
