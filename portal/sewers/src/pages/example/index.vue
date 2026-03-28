@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { useNotificationStore } from '@/core/notifications'
-import { useLoaderStore } from '@/core/loader'
-import { useContextMenuStore } from '@/core/contextMenu'
+import { useNotificationStore } from '../../core/notifications'
+import { useLoaderStore } from '../../core/loader'
+import { useContextMenuStore } from '../../core/contextMenu'
 
 const notificationStore = useNotificationStore()
 const loaderStore = useLoaderStore()

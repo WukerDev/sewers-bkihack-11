@@ -1,11 +1,10 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { useNotificationStore } from '@/core/notifications'
+import { useNotificationStore } from '../../core/notifications'
 
 const notificationStore = useNotificationStore()
 const activeTab = ref('dashboard')
 
-// --- LOKALNY STAN (zamiast zewnętrznego Store'a) ---
 const monthlyEarnings = ref<number>(12450.75)
 const providerToken = ref<string>('sk-prov-9876543210abcdef')
 
@@ -56,7 +55,6 @@ const nodes = ref([
   }
 ])
 
-// --- MOCK DANYCH DO WYKRESÓW ---
 const historicalEarnings = Array.from({ length: 7 }, (_, i) => ({ day: i+1, amount: monthlyEarnings.value * (1 + (Math.random() - 0.5) * 0.1) }))
 const historicalLatency = Array.from({ length: 7 }, (_, i) => ({ day: i+1, latency: 4 + (Math.random() * 4) }))
 const powerUsageData = [850, 890, 1020, 1050, 980, 1080, 1150, 1080] // w Watach
@@ -78,7 +76,6 @@ function generateNewToken() {
   providerToken.value = `sk-prov-${randomChars}`
 }
 
-// --- LOGIKA WIDOKU ---
 async function copyToClipboard(text: string) {
   try {
     await navigator.clipboard.writeText(text)
@@ -171,7 +168,7 @@ function getStatusColor(status: string) {
                       auto-draw
                     >
                       <template v-slot:label="item">
-                        {{ Math.round(item.value) }} zł
+                        {{ Math.round(Number(item.value))}} zł
                       </template>
                     </v-sparkline>
                   </div>

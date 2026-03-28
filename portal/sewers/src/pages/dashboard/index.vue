@@ -5,7 +5,7 @@
         <v-card class="aero-glass">
           <div class="aero-title-bar">{{ value.label }}</div>
           <v-card-text class="text-center pb-2">
-            <div class="text-h4 font-weight-bold text-white text-glow">
+            <div class="text-h4 font-weight-bold text-black text-glow">
               {{ config.metrics[key as keyof typeof config.metrics] }}
             </div>
           </v-card-text>
@@ -37,7 +37,7 @@
                     :style="{ transform: store.openedClusterId === cluster.id ? 'rotate(90deg)' : 'rotate(0deg)' }"
                   >mdi-chevron-right</v-icon>
                   <div :class="cluster.status === 'available' ? 'menu-dot-available' : 'menu-dot-busy'" class="mr-3"></div>
-                  <span class="text-white font-weight-bold">{{ cluster.name }}</span>
+                  <span class="text-black font-weight-bold">{{ cluster.name }}</span>
                   <v-chip size="x-small" color="primary" variant="outlined" class="ml-auto">
                     Firm: {{ cluster.companies.length }}
                   </v-chip>
@@ -53,7 +53,7 @@
                     @click="store.selectCompany(company.id)"
                   >
                     <div :class="company.status === 'available' ? 'menu-dot-available' : 'menu-dot-busy'" class="mr-2" style="transform: scale(0.7);"></div>
-                    <span class="text-grey-lighten-2 text-body-2">{{ company.name }}</span>
+                    <span class="text-black text-body-2">{{ company.name }}</span>
                   </div>
                 </div>
               </v-expand-transition>
@@ -99,7 +99,7 @@ function initMap() {
     maxBoundsViscosity: 1.0
   })
 
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
     attribution: '&copy; OpenStreetMap'
   }).addTo(map)
 
@@ -167,175 +167,81 @@ watch(() => store.selectedCompanyId, () => {
 </script>
 
 <style scoped>
-/* VISTA / AERO GLASS STYLES */
-.vista-background { background: radial-gradient(circle at 50% 0%, #1a3a4c 0%, #0d1117 70%); min-height: 100vh; }
-.aero-glass { background: rgba(18, 25, 33, 0.45) !important; backdrop-filter: blur(12px) saturate(150%); border: 1px solid rgba(255, 255, 255, 0.15) !important; border-top: 1px solid rgba(255, 255, 255, 0.4) !important; box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.6), inset 0 1px 1px rgba(255, 255, 255, 0.2) !important; border-radius: 8px !important; color: white !important; }
-.aero-title-bar { background: linear-gradient(180deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 49%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.4) 100%); padding: 6px 16px; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; border-bottom: 1px solid rgba(0,0,0,0.5); box-shadow: inset 0 1px 0 rgba(255,255,255,0.3); }
 
-/* --- MAPA I KLASTRY --- */
-.node-dot-wrapper { position: relative; width: 20px; height: 20px; display: flex; justify-content: center; align-items: center; }
-.node-dot { width: 14px; height: 14px; border-radius: 50%; transition: all 0.3s ease; }
-.dot-available { background-color: #00ff00; box-shadow: 0 0 10px #00ff00; animation: pulse-green 1.5s infinite alternate; }
-.dot-busy { background-color: transparent; border: 3px solid #ffeb3b; border-top-color: #f57f17; animation: spin-yellow 1s linear infinite; }
-.dot-selected { transform: scale(1.8); background-color: #2196f3; box-shadow: 0 0 20px #2196f3; animation: none !important; border: none; z-index: 1000; }
-
-.node-tooltip { position: absolute; top: 25px; background: rgba(0,0,0,0.9); padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; border: 1px solid rgba(255,255,255,0.2); white-space: nowrap; opacity: 0; visibility: hidden; transition: all 0.2s; color: white; text-shadow: none; pointer-events: none; }
-.node-dot-wrapper:hover .node-tooltip { opacity: 1; visibility: visible; }
-
-/* Kropki w Menu bocznym */
-.menu-dot-available { width: 12px; height: 12px; border-radius: 50%; background-color: #00ff00; box-shadow: 0 0 8px #00ff00; }
-.menu-dot-busy { width: 12px; height: 12px; border-radius: 50%; border: 2px solid #ffeb3b; border-top-color: transparent; animation: spin-yellow 1.5s linear infinite; }
-
-/* LISTA */
-.aero-list-item { transition: all 0.2s; border: 1px solid transparent; cursor: pointer; }
-.aero-list-item:hover { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); }
-.aero-list-item-selected { background: linear-gradient(90deg, rgba(33, 150, 243, 0.3) 0%, transparent 100%) !important; border-left: 4px solid #2196f3 !important; }
-
-/* KARTY SERWERÓW */
-.server-card { background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 6px; padding: 12px; }
-.status-badge { padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; }
-.status-badge.available { background: rgba(76, 175, 80, 0.2); color: #81c784; border: 1px solid #4caf50; }
-.status-badge.busy { background: rgba(255, 193, 7, 0.2); color: #ffd54f; border: 1px solid #ffc107; }
-
-/* VISTA PROGRESS BAR */
-.vista-progress-container { height: 20px; background: #111; border-radius: 4px; border: 1px solid #333; box-shadow: inset 0 2px 5px rgba(0,0,0,0.8); position: relative; overflow: hidden; }
-.vista-progress-bar { height: 100%; border-radius: 3px; box-shadow: inset 0 1px 1px rgba(255,255,255,0.5), inset 0 -1px 2px rgba(0,0,0,0.5); transition: width 0.5s ease; }
-.bar-free { background: linear-gradient(180deg, #66bb6a 0%, #43a047 49%, #2e7d32 50%, #1b5e20 100%); }
-.bar-busy { background: linear-gradient(180deg, #ffa726 0%, #fb8c00 49%, #ef6c00 50%, #e65100 100%); }
-.progress-text { position: absolute; width: 100%; text-align: center; top: 0; left: 0; font-size: 0.75rem; line-height: 20px; color: white; text-shadow: 1px 1px 2px black; font-weight: bold; }
-
-@keyframes pulse-green {
-  0% { transform: scale(0.9); box-shadow: 0 0 5px #00ff00; }
-  100% { transform: scale(1.2); box-shadow: 0 0 15px #00ff00; }
-}
-@keyframes spin-yellow {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+.aero-glass {
+  /* Zamiana bieli na mrożony błękitny szary */
+  background: rgba(210, 225, 240, 0.5) !important;
+  backdrop-filter: blur(15px) saturate(140%);
+  -webkit-backdrop-filter: blur(15px) saturate(140%);
+  border: 1px solid rgba(255, 255, 255, 0.4) !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.7) !important;
+  /* Mocniejszy cień zewnętrzny, by karty "odcięły się" od tła */
+  box-shadow: 0 10px 40px rgba(0, 50, 100, 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.5) !important;
+  border-radius: 12px !important;
+  /* Bardzo ciemny błękit dla tekstu */
+  color: #102a43 !important;
 }
 
-/* --- MAPA I KLASTRY (NOWE, WIĘKSZE IKONY ZE STATUSEM) --- */
-.cluster-marker {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  width: 160px;
-  transition: transform 0.2s ease;
+.aero-title-bar {
+  /* Ciemniejszy gradient paska tytułu dla lepszej struktury */
+  background: linear-gradient(180deg, rgba(220,235,255,0.8) 0%, rgba(180,210,240,0.6) 100%);
+  padding: 8px 16px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #0d3b66; /* Głęboki granat */
+  border-bottom: 1px solid rgba(0, 80, 150, 0.15);
+  border-radius: 12px 12px 0 0;
 }
 
-.marker-icon-wrapper {
-  position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-/* Pozycjonowanie kropki statusu w prawym górnym rogu dużej ikony */
-.map-status-dot {
-  position: absolute;
-  top: -2px;
-  right: -8px;
-  width: 16px !important;
-  height: 16px !important;
-  z-index: 2;
-}
-
-/* Wielka ikona serwera */
-.cluster-marker i {
-  font-size: 42px; /* ZNACZNE POWIĘKSZENIE */
-  line-height: 42px;
-  filter: drop-shadow(0 0 8px currentColor);
-  transition: all 0.3s ease;
-  cursor: pointer;
-}
-
-.cluster-label {
-  margin-top: 6px;
-  background: rgba(0, 0, 0, 0.85);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: #e0e0e0;
-  padding: 4px 10px;
-  border-radius: 4px;
-  font-size: 12px;
-  font-weight: bold;
-  white-space: nowrap;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.6);
-  pointer-events: none;
-}
-
-/* Stan zaznaczenia klikniętego klastra */
-.marker-selected {
-  transform: scale(1.15);
-  z-index: 1000 !important;
-}
-
-.marker-selected i {
-  color: #2196f3 !important;
-  filter: drop-shadow(0 0 20px #2196f3);
-}
-
-.marker-selected .cluster-label {
-  background: #2196f3;
-  border-color: #64b5f6;
-  color: white;
-  text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
-}
-
-/* --- DRZEWKO FIRM (TREEVIEW) --- */
+/* --- KATALOG I DRZEWKO (Poprawa kontrastu) --- */
 .cluster-tree-header {
-  padding: 10px 12px;
-  border-radius: 6px;
-  cursor: pointer;
-  background: rgba(0, 0, 0, 0.3);
-  border: 1px solid transparent;
-  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.2);
+  color: #102a43;
+  border: 1px solid rgba(0, 120, 215, 0.1);
 }
 .cluster-tree-header:hover {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(0, 120, 215, 0.15);
 }
 .cluster-open {
-  background: linear-gradient(90deg, rgba(33, 150, 243, 0.2) 0%, transparent 100%);
-  border-left: 3px solid #2196f3;
-}
-.transition-transform {
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: rgba(0, 120, 215, 0.1);
+  border-left: 4px solid #0056b3;
+  color: #004085;
 }
 
-.company-list-wrapper {
-  margin-left: 20px;
-  border-left: 1px solid rgba(255, 255, 255, 0.1);
-  padding-left: 10px;
-  padding-top: 4px;
-  padding-bottom: 4px;
-}
-.company-tree-item {
-  display: flex;
-  align-items: center;
-  padding: 6px 10px;
-  margin-bottom: 2px;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-.company-tree-item:hover {
-  background: rgba(255, 255, 255, 0.05);
-}
+.company-tree-item { color: #243b53; }
+.company-tree-item:hover { background: rgba(0, 120, 215, 0.1); }
 .company-selected {
-  background: rgba(33, 150, 243, 0.3) !important;
-  color: white !important;
+  background: rgba(0, 120, 215, 0.25) !important;
+  color: #004085 !important;
+  font-weight: bold;
 }
 
-/* --- KROPKI MENU (ZOSTAJĄ BEZ ZMIAN) --- */
-.menu-dot-available { width: 12px; height: 12px; border-radius: 50%; background-color: #00ff00; box-shadow: 0 0 8px #00ff00; animation: pulse-green 1.5s infinite alternate; }
-.menu-dot-busy { width: 12px; height: 12px; border-radius: 50%; border: 2px solid #ffeb3b; border-top-color: transparent; animation: spin-yellow 1.5s linear infinite; }
+/* --- KARTY SERWERÓW W MODALU --- */
+.server-card {
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  color: #102a43;
+}
 
-@keyframes pulse-green {
-  0% { transform: scale(0.9); box-shadow: 0 0 5px #00ff00; }
-  100% { transform: scale(1.2); box-shadow: 0 0 15px #00ff00; }
+/* VISTA PROGRESS BAR (Mniej agresywne kolory) */
+.vista-progress-container {
+  background: #cbd5e0;
+  border: 1px solid #a0aec0;
 }
-@keyframes spin-yellow {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+.bar-free { background: linear-gradient(180deg, #68d391 0%, #38a169 100%); }
+.bar-busy { background: linear-gradient(180deg, #f6ad55 0%, #dd6b20 100%); }
+.progress-text { color: #102a43; text-shadow: 0 1px 0 rgba(255,255,255,0.8); }
+
+/* Marker Mapy (Etykiety) */
+.cluster-label {
+  background: rgba(255, 255, 255, 0.95);
+  color: #0d3b66;
+  border: 1px solid #0056b3;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
+
+/* Pozostałe animacje i kropki (zostają z wersji Light, ale z lepszym kontrastem) */
+.menu-dot-available { background-color: #38a169; box-shadow: 0 0 8px rgba(56, 161, 105, 0.4); }
+.menu-dot-busy { border-color: #dd6b20; }
 </style>
