@@ -8,6 +8,7 @@
 import { BinaryReader, BinaryWriter } from "@bufbuild/protobuf/wire";
 import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
+import { Duration } from "./google/protobuf/duration";
 
 export const protobufPackage = "sewers";
 
@@ -30,8 +31,8 @@ export interface Cpu {
 }
 
 export interface DailyWindow {
-  windowStart: string;
-  windowEnd: string;
+  windowStart: Duration | undefined;
+  windowEnd: Duration | undefined;
 }
 
 export interface WindowSchedule {
@@ -546,16 +547,16 @@ export const Cpu: MessageFns<Cpu> = {
 };
 
 function createBaseDailyWindow(): DailyWindow {
-  return { windowStart: "", windowEnd: "" };
+  return { windowStart: undefined, windowEnd: undefined };
 }
 
 export const DailyWindow: MessageFns<DailyWindow> = {
   encode(message: DailyWindow, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    if (message.windowStart !== "") {
-      writer.uint32(10).string(message.windowStart);
+    if (message.windowStart !== undefined) {
+      Duration.encode(message.windowStart, writer.uint32(10).fork()).join();
     }
-    if (message.windowEnd !== "") {
-      writer.uint32(18).string(message.windowEnd);
+    if (message.windowEnd !== undefined) {
+      Duration.encode(message.windowEnd, writer.uint32(18).fork()).join();
     }
     return writer;
   },
@@ -572,7 +573,7 @@ export const DailyWindow: MessageFns<DailyWindow> = {
             break;
           }
 
-          message.windowStart = reader.string();
+          message.windowStart = Duration.decode(reader, reader.uint32());
           continue;
         }
         case 2: {
@@ -580,7 +581,7 @@ export const DailyWindow: MessageFns<DailyWindow> = {
             break;
           }
 
-          message.windowEnd = reader.string();
+          message.windowEnd = Duration.decode(reader, reader.uint32());
           continue;
         }
       }
@@ -595,25 +596,25 @@ export const DailyWindow: MessageFns<DailyWindow> = {
   fromJSON(object: any): DailyWindow {
     return {
       windowStart: isSet(object.windowStart)
-        ? globalThis.String(object.windowStart)
+        ? Duration.fromJSON(object.windowStart)
         : isSet(object.window_start)
-        ? globalThis.String(object.window_start)
-        : "",
+        ? Duration.fromJSON(object.window_start)
+        : undefined,
       windowEnd: isSet(object.windowEnd)
-        ? globalThis.String(object.windowEnd)
+        ? Duration.fromJSON(object.windowEnd)
         : isSet(object.window_end)
-        ? globalThis.String(object.window_end)
-        : "",
+        ? Duration.fromJSON(object.window_end)
+        : undefined,
     };
   },
 
   toJSON(message: DailyWindow): unknown {
     const obj: any = {};
-    if (message.windowStart !== "") {
-      obj.windowStart = message.windowStart;
+    if (message.windowStart !== undefined) {
+      obj.windowStart = Duration.toJSON(message.windowStart);
     }
-    if (message.windowEnd !== "") {
-      obj.windowEnd = message.windowEnd;
+    if (message.windowEnd !== undefined) {
+      obj.windowEnd = Duration.toJSON(message.windowEnd);
     }
     return obj;
   },
@@ -623,8 +624,12 @@ export const DailyWindow: MessageFns<DailyWindow> = {
   },
   fromPartial<I extends Exact<DeepPartial<DailyWindow>, I>>(object: I): DailyWindow {
     const message = createBaseDailyWindow();
-    message.windowStart = object.windowStart ?? "";
-    message.windowEnd = object.windowEnd ?? "";
+    message.windowStart = (object.windowStart !== undefined && object.windowStart !== null)
+      ? Duration.fromPartial(object.windowStart)
+      : undefined;
+    message.windowEnd = (object.windowEnd !== undefined && object.windowEnd !== null)
+      ? Duration.fromPartial(object.windowEnd)
+      : undefined;
     return message;
   },
 };

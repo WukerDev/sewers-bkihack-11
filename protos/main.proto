@@ -21,8 +21,8 @@ int32 threads_usage = 6;
 }
 
 message DailyWindow {
-  string window_start = 1;
-  string window_end = 2;
+  google.protobuf.Duration window_start = 1;
+  google.protobuf.Duration window_end = 2;
 }
 
 message WindowSchedule {
