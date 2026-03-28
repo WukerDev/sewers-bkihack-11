@@ -17,7 +17,7 @@ const handleCreateKey = () => {
   apiStore.createKey(newKeyName.value);
   newKeyName.value = "";
   showAddKey.value = false;
-  notificationStore.showSnackbar("Wygenerowano nowy klucz API", "success");
+  notificationStore.showSnackbar("Wygenerowano nowy klucz dostępu", "success");
 };
 
 const copy = async (text: string) => {
@@ -41,7 +41,7 @@ const copy = async (text: string) => {
         class="d-flex flex-column align-center"
       >
         <h1 class="text-h4 font-weight-bold mb-8 aero-title-text text-center">
-          API & Integracje
+          Klucze dostępu
         </h1>
 
         <v-card
@@ -55,7 +55,7 @@ const copy = async (text: string) => {
             align-tabs="start"
           >
             <v-tab value="keys">
-              <v-icon start size="small">mdi-key-chain</v-icon>Klucze API
+              <v-icon start size="small">mdi-key-chain</v-icon>Klucze
             </v-tab>
           </v-tabs>
 

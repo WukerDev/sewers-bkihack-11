@@ -8,7 +8,7 @@
       <v-spacer></v-spacer>
       <button class="aero-action-btn" @click="isWizardOpen = true">
         <v-icon left size="small">mdi-plus-circle</v-icon>
-        DODAJ TASKA
+        DODAJ ZADANIE
       </button>
     </div>
 

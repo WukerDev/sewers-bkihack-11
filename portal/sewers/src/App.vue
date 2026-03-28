@@ -78,12 +78,12 @@ import { ref } from "vue";
 
 const links = ref([
   { title: "Platforma", to: "/" },
-  { title: "Dashboard", to: "/dashboard" },
-  { title: "Taski", to: "/tasks" },
+  { title: "Widok Główny", to: "/dashboard" },
+  { title: "Zadania", to: "/tasks" },
   { title: "Agenci AI", to: "/agents" },
-  { title: "Biling", to: "/billing" },
+  { title: "Finansowanie", to: "/billing" },
   { title: "Dla Dostawców", to: "/providers" },
-  { title: "API", to: "/api" },
+  { title: "Klucze Dostępu", to: "/api" },
 ]);
 
 const profileMenu = ref([
