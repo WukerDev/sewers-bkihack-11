@@ -1,7 +1,10 @@
 syntax = "proto3";
-package  manhole;
+package manhole;
 
 option csharp_namespace = "Sewers.ManholeGenerated";
+
+// Dodajemy puste zapytanie, bo serwer po prostu czeka na "zaczepkę"
+message Empty {}
 
 message CpuUsageInfo {
     int32 cpu_id = 1;
@@ -15,18 +18,15 @@ message GpuUsageInfo {
     double temperature = 3;
 }
 
-message HeartbeatRequest {
+message HeartbeatResponse {
     string id = 1;
-    bool status = 2;
+    string status = 2; // "free", "busy", "error"
     repeated CpuUsageInfo cpus = 3;
     repeated GpuUsageInfo gpus = 4;
     double ram_usage = 5;
 }
 
-message HeartbeatResponse{
-    bool success = 1;
-}
-
-service Heartbeat{
-    rpc Heartbeat (HeartbeatRequest) returns (HeartbeatResponse);
+service NodeMonitor {
+    // Klient (Mózg) wywołuje raz, a Serwer (Manhole) strumieniuje dane póki połączenie trwa
+    rpc StreamStats (Empty) returns (stream HeartbeatResponse);
 }

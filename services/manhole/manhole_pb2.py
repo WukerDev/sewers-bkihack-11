@@ -24,7 +24,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\rmanhole.proto\x12\x07manhole\"I\n\x0c\x43puUsageInfo\x12\x0e\n\x06\x63pu_id\x18\x01 \x01(\x05\x12\x14\n\x0cthread_usage\x18\x02 \x01(\x05\x12\x13\n\x0btemperature\x18\x03 \x01(\x01\"G\n\x0cGpuUsageInfo\x12\x0e\n\x06gpu_id\x18\x01 \x01(\x05\x12\x12\n\nvram_usage\x18\x02 \x01(\x01\x12\x13\n\x0btemperature\x18\x03 \x01(\x01\"\x8b\x01\n\x10HeartbeatRequest\x12\n\n\x02id\x18\x01 \x01(\t\x12\x0e\n\x06status\x18\x02 \x01(\x08\x12#\n\x04\x63pus\x18\x03 \x03(\x0b\x32\x15.manhole.CpuUsageInfo\x12#\n\x04gpus\x18\x04 \x03(\x0b\x32\x15.manhole.GpuUsageInfo\x12\x11\n\tram_usage\x18\x05 \x01(\x01\"$\n\x11HeartbeatResponse\x12\x0f\n\x07success\x18\x01 \x01(\x08\x32O\n\tHeartbeat\x12\x42\n\tHeartbeat\x12\x19.manhole.HeartbeatRequest\x1a\x1a.manhole.HeartbeatResponseB\x1a\xaa\x02\x17Sewers.ManholeGeneratedb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\rmanhole.proto\x12\x07manhole\"\x07\n\x05\x45mpty\"I\n\x0c\x43puUsageInfo\x12\x0e\n\x06\x63pu_id\x18\x01 \x01(\x05\x12\x14\n\x0cthread_usage\x18\x02 \x01(\x05\x12\x13\n\x0btemperature\x18\x03 \x01(\x01\"G\n\x0cGpuUsageInfo\x12\x0e\n\x06gpu_id\x18\x01 \x01(\x05\x12\x12\n\nvram_usage\x18\x02 \x01(\x01\x12\x13\n\x0btemperature\x18\x03 \x01(\x01\"\x8c\x01\n\x11HeartbeatResponse\x12\n\n\x02id\x18\x01 \x01(\t\x12\x0e\n\x06status\x18\x02 \x01(\t\x12#\n\x04\x63pus\x18\x03 \x03(\x0b\x32\x15.manhole.CpuUsageInfo\x12#\n\x04gpus\x18\x04 \x03(\x0b\x32\x15.manhole.GpuUsageInfo\x12\x11\n\tram_usage\x18\x05 \x01(\x01\x32J\n\x0bNodeMonitor\x12;\n\x0bStreamStats\x12\x0e.manhole.Empty\x1a\x1a.manhole.HeartbeatResponse0\x01\x42\x1a\xaa\x02\x17Sewers.ManholeGeneratedb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -32,14 +32,14 @@ _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'manhole_pb2', _globals)
 if not _descriptor._USE_C_DESCRIPTORS:
   _globals['DESCRIPTOR']._loaded_options = None
   _globals['DESCRIPTOR']._serialized_options = b'\252\002\027Sewers.ManholeGenerated'
-  _globals['_CPUUSAGEINFO']._serialized_start=26
-  _globals['_CPUUSAGEINFO']._serialized_end=99
-  _globals['_GPUUSAGEINFO']._serialized_start=101
-  _globals['_GPUUSAGEINFO']._serialized_end=172
-  _globals['_HEARTBEATREQUEST']._serialized_start=175
-  _globals['_HEARTBEATREQUEST']._serialized_end=314
-  _globals['_HEARTBEATRESPONSE']._serialized_start=316
-  _globals['_HEARTBEATRESPONSE']._serialized_end=352
-  _globals['_HEARTBEAT']._serialized_start=354
-  _globals['_HEARTBEAT']._serialized_end=433
+  _globals['_EMPTY']._serialized_start=26
+  _globals['_EMPTY']._serialized_end=33
+  _globals['_CPUUSAGEINFO']._serialized_start=35
+  _globals['_CPUUSAGEINFO']._serialized_end=108
+  _globals['_GPUUSAGEINFO']._serialized_start=110
+  _globals['_GPUUSAGEINFO']._serialized_end=181
+  _globals['_HEARTBEATRESPONSE']._serialized_start=184
+  _globals['_HEARTBEATRESPONSE']._serialized_end=324
+  _globals['_NODEMONITOR']._serialized_start=326
+  _globals['_NODEMONITOR']._serialized_end=400
 # @@protoc_insertion_point(module_scope)

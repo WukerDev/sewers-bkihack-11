@@ -25,7 +25,7 @@ if _version_not_supported:
     )
 
 
-class HeartbeatStub(object):
+class NodeMonitorStub(object):
     """Missing associated documentation comment in .proto file."""
 
     def __init__(self, channel):
@@ -34,43 +34,44 @@ class HeartbeatStub(object):
         Args:
             channel: A grpc.Channel.
         """
-        self.Heartbeat = channel.unary_unary(
-                '/manhole.Heartbeat/Heartbeat',
-                request_serializer=manhole__pb2.HeartbeatRequest.SerializeToString,
+        self.StreamStats = channel.unary_stream(
+                '/manhole.NodeMonitor/StreamStats',
+                request_serializer=manhole__pb2.Empty.SerializeToString,
                 response_deserializer=manhole__pb2.HeartbeatResponse.FromString,
                 _registered_method=True)
 
 
-class HeartbeatServicer(object):
+class NodeMonitorServicer(object):
     """Missing associated documentation comment in .proto file."""
 
-    def Heartbeat(self, request, context):
-        """Missing associated documentation comment in .proto file."""
+    def StreamStats(self, request, context):
+        """Klient (Mózg) wywołuje raz, a Serwer (Manhole) strumieniuje dane póki połączenie trwa
+        """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
 
-def add_HeartbeatServicer_to_server(servicer, server):
+def add_NodeMonitorServicer_to_server(servicer, server):
     rpc_method_handlers = {
-            'Heartbeat': grpc.unary_unary_rpc_method_handler(
-                    servicer.Heartbeat,
-                    request_deserializer=manhole__pb2.HeartbeatRequest.FromString,
+            'StreamStats': grpc.unary_stream_rpc_method_handler(
+                    servicer.StreamStats,
+                    request_deserializer=manhole__pb2.Empty.FromString,
                     response_serializer=manhole__pb2.HeartbeatResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'manhole.Heartbeat', rpc_method_handlers)
+            'manhole.NodeMonitor', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
-    server.add_registered_method_handlers('manhole.Heartbeat', rpc_method_handlers)
+    server.add_registered_method_handlers('manhole.NodeMonitor', rpc_method_handlers)
 
 
  # This class is part of an EXPERIMENTAL API.
-class Heartbeat(object):
+class NodeMonitor(object):
     """Missing associated documentation comment in .proto file."""
 
     @staticmethod
-    def Heartbeat(request,
+    def StreamStats(request,
             target,
             options=(),
             channel_credentials=None,
@@ -80,11 +81,11 @@ class Heartbeat(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(
+        return grpc.experimental.unary_stream(
             request,
             target,
-            '/manhole.Heartbeat/Heartbeat',
-            manhole__pb2.HeartbeatRequest.SerializeToString,
+            '/manhole.NodeMonitor/StreamStats',
+            manhole__pb2.Empty.SerializeToString,
             manhole__pb2.HeartbeatResponse.FromString,
             options,
             channel_credentials,

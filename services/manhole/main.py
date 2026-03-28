@@ -1,115 +1,86 @@
-import time
-import requests
-import logging
 import grpc
-import config
+from concurrent import futures
+import time
+import logging
+import uuid
 import hardware
-import docker_orchestrator
-import storage
+# import config # odkomentuj, jeśli masz tam NODE_ID, inaczej użyjemy uuid poniżej
+
 import manhole_pb2
 import manhole_pb2_grpc
 
-# Konfiguracja logowania
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+# Konfiguracja
+NODE_ID = str(uuid.uuid4()) # Unikalne ID tego konkretnego węzła
+NODE_STATUS = "free"
 
-def send_heartbeat_rpc(stub):
-    """Pobiera pełne statystyki i pakuje je zgodnie z manhole.proto"""
-    try:
-        # Pobieramy dane z hardware.py (poprawionego wcześniej)
-        stats = hardware.get_full_stats()
+class NodeMonitorServicer(manhole_pb2_grpc.NodeMonitorServicer):
+    """To jest serce Twojego serwera gRPC. Tu 'puchną' dane dla Mózgu."""
+    
+    def StreamStats(self, request, context):
+        logging.info("🔗 Mózg (klient) podłączył się do strumienia.")
         
-        # Tworzymy główny request
-        request = manhole_pb2.HeartbeatRequest(
-            id=config.NODE_ID,
-            status=True,
-            ram_usage=stats['ram_usage']
-        )
+        while context.is_active():
+            try:
+                # 1. Pobieramy realne dane z hardware.py
+                stats = hardware.get_full_stats()
+                
+                # 2. Budujemy odpowiedź zgodną z Twoim manhole.proto
+                response = manhole_pb2.HeartbeatResponse(
+                    id=NODE_ID,
+                    status=NODE_STATUS,
+                    ram_usage=stats['ram_usage']
+                )
+                
+                # Dodajemy procesory (repeated cpus)
+                for c in stats['cpus']:
+                    cpu_item = response.cpus.add()
+                    cpu_item.cpu_id = c['cpu_id']
+                    cpu_item.thread_usage = int(c['thread_usage'])
+                    cpu_item.temperature = float(c['temperature'])
+
+                # Dodajemy karty graficzne (repeated gpus)
+                for g in stats['gpus']:
+                    gpu_item = response.gpus.add()
+                    gpu_item.gpu_id = g['gpu_id']
+                    gpu_item.vram_usage = float(g['vram_usage'])
+                    gpu_item.temperature = float(g['temperature'])
+
+                # 3. Yield wysyła paczkę przez rurę (streaming)
+                yield response
+                
+                # Czekamy 2 sekundy przed kolejnym odczytem
+                time.sleep(2)
+                
+            except Exception as e:
+                logging.error(f"❌ Błąd strumieniowania: {e}")
+                break
         
-        # Iterujemy po liście procesorów i dodajemy do wiadomości Proto
-        for c in stats['cpus']:
-            cpu_item = request.cpus.add() # Tworzy nowy obiekt CpuUsageInfo wewnątrz listy
-            cpu_item.cpu_id = c['cpu_id']
-            cpu_item.thread_usage = c['thread_usage']
-            cpu_item.temperature = c['temperature']
-
-        # Iterujemy po liście kart graficznych
-        for g in stats['gpus']:
-            gpu_item = request.gpus.add() # Tworzy nowy obiekt GpuUsageInfo wewnątrz listy
-            gpu_item.gpu_id = g['gpu_id']
-            gpu_item.vram_usage = g['vram_usage']
-            gpu_item.temperature = g['temperature']
-
-        # Wysłanie przez gRPC
-        response = stub.Heartbeat(request)
-        return response.success
-        
-    except grpc.RpcError as e:
-        logging.warning(f"⚠️ Brain offline ({e.code()})")
-        return False
-    except Exception as e:
-        logging.error(f"❌ Błąd pakowania danych Proto: {e}")
-        return False
-
-def poll_for_tasks():
-    """Odpytuje Brain o zadania. Obsługuje brak połączenia."""
-    try:
-        response = requests.get(
-            f"{config.ORCHESTRATOR_URL}/node/tasks/poll", 
-            params={"api_key": config.API_KEY},
-            timeout=3 # Krótki timeout, żeby nie blokować pętli
-        )
-        if response.status_code == 200:
-            return response.json()
-    except requests.exceptions.ConnectionError:
-        # Serwer HTTP nie działa? Nie śmiecimy w konsoli, po prostu wracamy.
-        pass
-    except Exception as e:
-        logging.debug(f"Błąd podczas odpytywania o zadania: {e}")
-    return None
+        logging.info("🔌 Mózg się rozłączył. Kończę nadawanie.")
 
 def main():
-    logging.info(f"🚀 Sewers Manhole ID: {config.NODE_ID}")
+    # Ustawiamy logowanie na konsolę
+    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+    logging.info(f"🚀 Sewers Manhole uruchomiony jako SERWER. ID: {NODE_ID}")
     
-    # Tworzymy kanał raz
-    with grpc.insecure_channel(config.GATEWAY_URL) as channel:
-        stub = manhole_pb2_grpc.HeartbeatStub(channel)
-        
-        while True:
-            # 1. Heartbeat
-            if send_heartbeat_rpc(stub):
-                logging.info("💓 Heartbeat dostarczony")
-            else:
-                logging.warning("💓 Heartbeat nieudany (Brain offline?)")
-            
-            # 2. Zadania
-            task = poll_for_tasks()
-            if task:
-                # Tutaj wejdzie procesowanie zadania (docker itp.)
-                logging.info(f"📥 Otrzymano zadanie: {task.get('id')}")
-            
-            time.sleep(config.POLLING_INTERVAL)
-
-def process_task(task):
-    task_id = task['id']
+    # Tworzymy serwer gRPC
+    server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
+    
+    # Rejestrujemy naszą usługę
+    manhole_pb2_grpc.add_NodeMonitorServicer_to_server(NodeMonitorServicer(), server)
+    
+    # Słuchamy na wszystkich interfejsach na porcie 13000
+    port = 13000
+    server.add_insecure_port(f'[::]:{port}')
+    
+    server.start()
+    logging.info(f"📡 Serwer gRPC nasłuchuje na porcie {port}...")
+    
     try:
-        # Poczatek pracy
-        local_zip = f"./data/{task_id}.zip"
-        storage.download_dataset(task['dataset_url'], local_zip)
-        
-        result = docker_orchestrator.run_task_container(
-            image=task['docker_image'],
-            command=task['command'],
-            task_id=task_id
-        )
-        
-        # Próba obliczenia checksumy (tylko jeśli plik istnieje)
-        output_file = f"./output/model_{task_id}.bin"
-        checksum = storage.calculate_checksum(output_file) if os.path.exists(output_file) else "no_output"
-        
-        # Raportowanie
-        # ... wysyłka raportu ...
-    except Exception as e:
-        logging.error(f"Błąd zadania {task_id}: {e}")
+        # Serwer musi działać w tle, dopóki go nie zamkniemy (np. Ctrl+C)
+        server.wait_for_termination()
+    except KeyboardInterrupt:
+        logging.info("🛑 Zatrzymywanie serwera...")
+        server.stop(0)
 
 if __name__ == "__main__":
     main()
