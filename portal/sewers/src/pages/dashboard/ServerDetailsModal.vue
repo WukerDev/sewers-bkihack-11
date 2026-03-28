@@ -1,45 +1,126 @@
 <template>
   <v-dialog
     :model-value="!!store.selectedCompany"
-    @update:model-value="(val) => { if (!val) store.selectCompany(null) }"
-    max-width="1000px"
-    transition="dialog-bottom-transition"
+    @update:model-value="
+      (val) => {
+        if (!val) store.selectCompany(null);
+      }
+    "
+    max-width="900px"
+    transition="scale-transition"
   >
-    <v-card class="aero-glass" v-if="store.selectedCompany" flat>
-      <div class="aero-title-bar d-flex justify-space-between align-center">
-        <span class="text-black">
-          💻 Dostępne serwery: <strong>{{ store.selectedCompany.name }}</strong>
-        </span>
-        <v-btn icon="mdi-close" size="small" color="black" variant="text" @click="store.selectCompany(null)"></v-btn>
+    <v-card class="aero-modal-frame" v-if="store.selectedCompany">
+      <div class="aero-window-header d-flex justify-space-between align-center">
+        <div class="d-flex align-center">
+          <div class="header-icon-sphere mr-3">
+            <v-icon size="18" color="white">mdi-server-network</v-icon>
+          </div>
+          <span class="aero-title-text">
+            Dostępne zasoby:
+            <span class="company-name-highlight">{{
+              store.selectedCompany.name
+            }}</span>
+          </span>
+        </div>
+        <v-btn
+          icon="mdi-close"
+          size="small"
+          class="aero-close-btn"
+          variant="flat"
+          @click="store.selectCompany(null)"
+        ></v-btn>
       </div>
 
-      <v-card-text class="pa-4" style="max-height: 70vh; overflow-y: auto;">
+      <v-card-text
+        class="pa-6 aero-content-bg"
+        style="max-height: 75vh; overflow-y: auto"
+      >
         <v-row>
-          <v-col v-for="server in store.selectedCompany.servers" :key="server.id" cols="12" md="6">
-            <div class="server-card p-3">
-              <div class="d-flex justify-space-between align-center mb-2">
-                <div class="text-h6 font-weight-bold d-flex align-center" style="color: #000;">
-                  <v-icon color="primary" class="mr-2">mdi-expansion-card-variant</v-icon>
-                  {{ server.gpu }}
+          <v-col
+            v-for="server in store.selectedCompany.servers"
+            :key="server.id"
+            cols="12"
+            md="6"
+          >
+            <v-card class="aero-server-item">
+              <div class="gloss-overlay"></div>
+              <div class="relative-content pa-4">
+                <div class="d-flex justify-space-between align-start mb-3">
+                  <div>
+                    <div
+                      class="text-h6 font-weight-black text-blue-darken-4 mb-0"
+                      style="line-height: 1.2"
+                    >
+                      {{ server.gpu }}
+                    </div>
+                    <div
+                      class="text-caption font-weight-bold text-primary text-uppercase"
+                    >
+                      Węzeł Obliczeniowy
+                    </div>
+                  </div>
+                  <div class="aero-status-pill" :class="server.status">
+                    <div class="status-dot"></div>
+                    {{
+                      server.status === "available" ? "Gotowy" : "Przetwarzanie"
+                    }}
+                  </div>
                 </div>
-                <div class="status-badge" :class="server.status">
-                  {{ server.status === 'available' ? 'Dostępny' : 'Zajęty' }}
+
+                <div class="spec-grid mb-4">
+                  <div class="spec-item truncate-wrapper">
+                    <v-tooltip activator="parent" location="top">{{
+                      server.availability
+                    }}</v-tooltip>
+                    <div class="text-truncate">
+                      <strong>⏱ Dostępność:</strong> {{ server.availability }}
+                    </div>
+                  </div>
+
+                  <div class="spec-item">
+                    <div class="text-truncate">
+                      <strong>💰 Cena:</strong> ${{ server.pricePerTflops }}/h
+                    </div>
+                  </div>
+
+                  <div class="spec-item">
+                    <div class="text-truncate">
+                      <strong>🧠 RAM:</strong> {{ server.ram }}
+                    </div>
+                  </div>
+
+                  <div class="spec-item">
+                    <div class="text-truncate">
+                      <strong>⚙️ CPU:</strong> {{ server.cpuThreads }}
+                    </div>
+                  </div>
+                </div>
+
+                <div class="gel-progress-wrapper mt-auto">
+                  <div
+                    class="d-flex justify-space-between text-caption font-weight-black mb-1 px-1"
+                  >
+                    <span class="text-blue-grey-darken-3"
+                      >Obciążenie Systemu</span
+                    >
+                    <span class="text-blue-darken-3">{{ server.load }}%</span>
+                  </div>
+                  <div class="gel-progress-container">
+                    <div
+                      class="gel-progress-bar"
+                      :class="
+                        server.status === 'available'
+                          ? 'gel-green'
+                          : 'gel-orange'
+                      "
+                      :style="{ width: server.load + '%' }"
+                    >
+                      <div class="gel-shine"></div>
+                    </div>
+                  </div>
                 </div>
               </div>
-
-              <v-row dense class="text-black text-body-2 mb-2" style="font-weight: 500;">
-                <v-col cols="6">⏱ Dostępność: {{ server.availability }}</v-col>
-                <v-col cols="6">💰 Cena: ${{ server.pricePerTflops }} / TFLOPS/h</v-col>
-                <v-col cols="4">💾 VRAM: {{ server.vram }}</v-col>
-                <v-col cols="4">🧠 RAM: {{ server.ram }}</v-col>
-                <v-col cols="4">⚙️ Wątki: {{ server.cpuThreads }}</v-col>
-              </v-row>
-
-              <div class="vista-progress-container mt-2">
-                <div class="vista-progress-bar" :class="{'bar-busy': server.status === 'busy', 'bar-free': server.status === 'available'}" :style="{ width: server.load + '%' }"></div>
-                <span class="progress-text">Obciążenie: {{ server.load }}%</span>
-              </div>
-            </div>
+            </v-card>
           </v-col>
         </v-row>
       </v-card-text>
@@ -49,82 +130,172 @@
 
 <script setup lang="ts">
 // PRZYWRÓCONO TWOJĄ ORYGINALNĄ ŚCIEŻKĘ
-import { useMainStore } from './store.ts'
+import { useMainStore } from "./store.ts";
 
-const store = useMainStore()
+const store = useMainStore();
 </script>
 
 <style scoped>
-/* VISTA / AERO GLASS LIGHT MODE - FROSTED AZURE */
-.aero-glass {
-  background: rgba(225, 235, 250, 0.75) !important;
-  backdrop-filter: blur(20px) saturate(170%);
-  -webkit-backdrop-filter: blur(20px) saturate(170%);
-  border: 1px solid rgba(255, 255, 255, 0.6) !important;
-  border-top: 1px solid rgba(255, 255, 255, 0.8) !important;
-  box-shadow: 0 15px 45px rgba(0, 40, 80, 0.2), inset 0 1px 2px rgba(255, 255, 255, 0.5) !important;
-  border-radius: 12px !important;
-  color: #000 !important; /* Wszystkie teksty czarne */
-}
-
-.aero-title-bar {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.8) 0%, rgba(210, 230, 255, 0.6) 100%);
-  padding: 10px 16px;
-  font-size: 0.9rem;
-  font-weight: 800;
-  color: #000;
-  border-bottom: 1px solid rgba(0, 80, 150, 0.15);
-  border-radius: 12px 12px 0 0;
-}
-
-/* KARTY SERWERÓW - JASNE */
-.server-card {
-  background: rgba(255, 255, 255, 0.5);
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  border-radius: 10px;
-}
-
-/* ODZNAKI STATUSU */
-.status-badge {
-  padding: 3px 10px;
-  border-radius: 6px;
-  font-size: 0.7rem;
-  font-weight: 800;
-  text-transform: uppercase;
-}
-.status-badge.available { background: #e8f5e9; color: #1b5e20; border: 1px solid #a5d6a7; }
-.status-badge.busy { background: #fffde7; color: #e65100; border: 1px solid #fff59d; }
-
-/* VISTA PROGRESS BAR LIGHT */
-.vista-progress-container {
-  height: 22px;
-  background: #d1d9e6;
-  border-radius: 11px;
-  border: 1px solid #a0aec0;
-  box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
-  position: relative;
+/* RAMA MODALA - GŁĘBOKIE SZKŁO */
+.aero-modal-frame {
+  background: rgba(240, 248, 255, 0.6) !important;
+  backdrop-filter: blur(25px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.8) !important;
+  border-radius: 20px !important;
+  box-shadow:
+    0 25px 50px rgba(0, 70, 150, 0.3),
+    inset 0 0 20px rgba(255, 255, 255, 0.5) !important;
   overflow: hidden;
 }
 
-.vista-progress-bar {
-  height: 100%;
-  border-radius: 10px;
-  box-shadow: inset 0 1px 2px rgba(255,255,255,0.4);
-  transition: width 0.5s ease;
+/* NAGŁÓWEK OKNA */
+.aero-window-header {
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.9) 0%,
+    rgba(186, 230, 253, 0.8) 50%,
+    rgba(125, 211, 252, 0.8) 100%
+  );
+  padding: 12px 20px;
+  border-bottom: 1px solid #0284c7;
 }
 
-.bar-free { background: linear-gradient(180deg, #68d391 0%, #38a169 100%); }
-.bar-busy { background: linear-gradient(180deg, #f6ad55 0%, #dd6b20 100%); }
-
-.progress-text {
-  position: absolute;
-  width: 100%;
-  text-align: center;
-  top: 0; left: 0;
-  font-size: 0.75rem;
-  line-height: 22px;
-  color: #000;
+.aero-title-text {
   font-weight: 800;
-  text-shadow: 0 1px 2px rgba(255,255,255,0.9);
+  color: #034d77;
+  font-size: 1rem;
+}
+
+.company-name-highlight {
+  color: #0284c7;
+  text-decoration: underline;
+}
+
+.header-icon-sphere {
+  background: radial-gradient(circle at 30% 30%, #38bdf8, #0284c7);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 10px rgba(2, 132, 199, 0.3);
+}
+
+/* KARTY SERWERÓW W ŚRODKU */
+.aero-server-item {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.9) 0%,
+    rgba(224, 242, 254, 0.5) 100%
+  ) !important;
+  border: 1px solid white !important;
+  border-radius: 15px !important;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05) !important;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s;
+}
+
+.aero-server-item:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 15px 30px rgba(0, 120, 215, 0.15) !important;
+}
+
+.spec-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  font-size: 0.85rem;
+}
+
+/* STATUS PILL */
+.aero-status-pill {
+  display: flex;
+  align-items: center;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+.aero-status-pill.available {
+  background: #dcfce7;
+  color: #166534;
+}
+.aero-status-pill.busy {
+  background: #ffedd5;
+  color: #9a3412;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 6px;
+  background: currentColor;
+  box-shadow: 0 0 5px currentColor;
+}
+
+/* GEL PROGRESS BAR */
+.gel-progress-container {
+  height: 20px;
+  background: #e2e8f0;
+  border-radius: 10px;
+  border: 1px solid #cbd5e1;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  position: relative;
+}
+
+.gel-progress-bar {
+  height: 100%;
+  border-radius: 8px;
+  position: relative;
+  transition: width 1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.gel-green {
+  background: linear-gradient(to bottom, #4ade80 0%, #22c55e 50%, #16a34a 100%);
+}
+.gel-orange {
+  background: linear-gradient(to bottom, #fbbf24 0%, #f59e0b 50%, #d97706 100%);
+}
+
+.gel-shine {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 40%;
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.5) 0%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  border-radius: 8px 8px 0 0;
+}
+
+/* PRZYCISK ZAMKNIJ */
+.aero-close-btn {
+  background: linear-gradient(to bottom, #f87171, #dc2626) !important;
+  color: white !important;
+  border: 1px solid #991b1b !important;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2) !important;
+}
+
+.gloss-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.4) 0%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  pointer-events: none;
 }
 </style>
