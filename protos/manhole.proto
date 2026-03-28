@@ -1,20 +1,32 @@
 syntax = "proto3";
+package  manhole;
 
-message CpuInfo {
+option csharp_namespace = "Sewers.ManholeGenerated";
+
+message CpuUsageInfo {
     int32 cpu_id = 1;
-    int32 thread_usage = 2; // w %
+    int32 thread_usage = 2; 
     double temperature = 3;
 }
 
-message GpuInfo {
+message GpuUsageInfo {
     int32 gpu_id = 1;
-    double vram_usage = 2; // w % lub MB
+    double vram_usage = 2; 
     double temperature = 3;
 }
 
-message Heartbeat {
-    bool status = 1;
-    repeated CpuInfo cpus = 2;
-    repeated GpuInfo gpus = 3;
-    double ram_usage = 4; // w %
+message HeartbeatRequest {
+    string id = 1;
+    bool status = 2;
+    repeated CpuUsageInfo cpus = 3;
+    repeated GpuUsageInfo gpus = 4;
+    double ram_usage = 5;
+}
+
+message HeartbeatResponse{
+    bool success = 1;
+}
+
+service Heartbeat{
+    rpc Heartbeat (HeartbeatRequest) returns (HeartbeatResponse);
 }
