@@ -13,35 +13,41 @@ import manhole_pb2_grpc
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 def send_heartbeat_rpc(stub):
-    """Wysyła statystyki przez gRPC."""
+    """Pobiera pełne statystyki i pakuje je zgodnie z manhole.proto"""
     try:
+        # Pobieramy dane z hardware.py (poprawionego wcześniej)
         stats = hardware.get_full_stats()
+        
+        # Tworzymy główny request
         request = manhole_pb2.HeartbeatRequest(
             id=config.NODE_ID,
             status=True,
             ram_usage=stats['ram_usage']
         )
         
-        # Prawidłowe dodawanie do list 'repeated' w Protobuf
+        # Iterujemy po liście procesorów i dodajemy do wiadomości Proto
         for c in stats['cpus']:
-            cpu_obj = request.cpus.add()
-            cpu_obj.cpu_id = c['cpu_id']
-            cpu_obj.thread_usage = c['thread_usage']
-            cpu_obj.temperature = c['temperature']
+            cpu_item = request.cpus.add() # Tworzy nowy obiekt CpuUsageInfo wewnątrz listy
+            cpu_item.cpu_id = c['cpu_id']
+            cpu_item.thread_usage = c['thread_usage']
+            cpu_item.temperature = c['temperature']
 
+        # Iterujemy po liście kart graficznych
         for g in stats['gpus']:
-            gpu_obj = request.gpus.add()
-            gpu_obj.gpu_id = g['gpu_id']
-            gpu_obj.vram_usage = g['vram_usage']
-            gpu_obj.temperature = g['temperature']
+            gpu_item = request.gpus.add() # Tworzy nowy obiekt GpuUsageInfo wewnątrz listy
+            gpu_item.gpu_id = g['gpu_id']
+            gpu_item.vram_usage = g['vram_usage']
+            gpu_item.temperature = g['temperature']
 
+        # Wysłanie przez gRPC
         response = stub.Heartbeat(request)
         return response.success
-    except grpc.RpcError:
-        # Ciche logowanie błędu gRPC - serwer może być wyłączony
+        
+    except grpc.RpcError as e:
+        logging.warning(f"⚠️ Brain offline ({e.code()})")
         return False
     except Exception as e:
-        logging.error(f"❌ Błąd wewnętrzny Heartbeat: {e}")
+        logging.error(f"❌ Błąd pakowania danych Proto: {e}")
         return False
 
 def poll_for_tasks():
