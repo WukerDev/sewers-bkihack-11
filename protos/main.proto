@@ -1,0 +1,171 @@
+syntax = "proto3";
+
+package sewers;
+
+message Server {
+  string id = 1;
+  string gpu = 2;
+  string vram = 3;
+  string ram = 4;
+  int32 cpu_threads = 5;
+  double price_per_tflops = 6;
+  int32 load = 7;
+  string status = 8;
+  string availability = 9;
+}
+
+message Company {
+  string id = 1;
+  string name = 2;
+  string status = 3;
+  repeated Server servers = 4;
+}
+
+message Cluster {
+  string id = 1;
+  string name = 2;
+  double lat = 3;
+  double lng = 4;
+  string status = 5;
+  repeated Company companies = 6;
+}
+
+message User {
+  string id = 1;
+  string name = 2;
+  string avatar = 3;
+  string role = 4;
+  double balance = 5;
+  string currency = 6;
+}
+
+message Metrics {
+  int32 online_nodes = 1;
+  string total_vram = 2;
+  int32 queued_tasks = 3;
+  int32 companies = 4;
+  int32 gpus = 5;
+}
+
+message Task {
+  int32 id = 1;
+  string name = 2;
+  string type = 3;
+  string model = 4;
+  string status = 5;
+  int32 progress = 6;
+}
+
+message TaskType {
+  string value = 1;
+  string label = 2;
+  string icon = 3;
+  string description = 4;
+}
+
+message GetConfigRequest {}
+
+message ConfigResponse {
+  Metrics metrics = 1;
+  repeated Cluster clusters = 2;
+  User current_user = 3;
+  repeated TaskType task_types = 4;
+  repeated string available_models = 5;
+}
+
+message GetTasksRequest {}
+
+message GetTasksResponse {
+  repeated Task tasks = 1;
+}
+
+message CreateTaskRequest {
+  string name = 1;
+  string type = 2;
+  string base_model = 3;
+  int32 priority = 4;
+}
+
+message CreateTaskResponse {
+  Task task = 1;
+  bool success = 2;
+  string message = 3;
+}
+
+message RemoveTaskRequest {
+  int32 id = 1;
+}
+
+message RemoveTaskResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message EditTaskRequest {
+  int32 id = 1;
+  string name = 2;
+  string type = 3;
+  string model = 4;
+}
+
+message EditTaskResponse {
+  Task task = 1;
+  bool success = 2;
+  string message = 3;
+}
+
+message PauseTaskRequest {
+  int32 id = 1;
+}
+
+message PauseTaskResponse {
+  Task task = 1;
+  bool success = 2;
+  string message = 3;
+}
+
+message StopTaskRequest {
+  int32 id = 1;
+}
+
+message StopTaskResponse {
+  Task task = 1;
+  bool success = 2;
+  string message = 3;
+}
+
+message Invoice {
+  string id = 1;
+  string date = 2;
+  double amount = 3;
+  string status = 4;
+}
+
+message GetBillingRequest {}
+
+message GetBillingResponse {
+  repeated Invoice invoices = 1;
+  double current_month_spending = 2;
+  double hourly_rate = 3;
+  repeated double daily_spending = 4;
+  repeated int32 resource_usage = 5;
+}
+
+service BillingService {
+  rpc GetBilling (GetBillingRequest) returns (GetBillingResponse);
+}
+
+service DashboardService {
+  rpc GetConfig (GetConfigRequest) returns (ConfigResponse);
+  rpc StreamMetrics (GetConfigRequest) returns (stream Metrics);
+}
+
+service TaskService {
+  rpc GetTasks (GetTasksRequest) returns (GetTasksResponse);
+  rpc CreateTask (CreateTaskRequest) returns (CreateTaskResponse);
+  rpc StreamTaskProgress (GetTasksRequest) returns (stream Task);
+  rpc RemoveTask (RemoveTaskRequest) returns (RemoveTaskResponse);
+  rpc EditTask (EditTaskRequest) returns (EditTaskResponse);
+  rpc PauseTask (PauseTaskRequest) returns (PauseTaskResponse);
+  rpc StopTask (StopTaskRequest) returns (StopTaskResponse);
+}

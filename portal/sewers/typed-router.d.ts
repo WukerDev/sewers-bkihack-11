@@ -30,9 +30,51 @@ declare module 'vue-router/auto-routes' {
       Record<never, never>,
       | never
     >,
+    '/agents/': RouteRecordInfo<
+      '/agents/',
+      '/agents',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/billing/': RouteRecordInfo<
+      '/billing/',
+      '/billing',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/dashboard/': RouteRecordInfo<
+      '/dashboard/',
+      '/dashboard',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/dashboard/ServerDetailsModal': RouteRecordInfo<
+      '/dashboard/ServerDetailsModal',
+      '/dashboard/ServerDetailsModal',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
     '/example/': RouteRecordInfo<
       '/example/',
       '/example',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/providers/': RouteRecordInfo<
+      '/providers/',
+      '/providers',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/tasks/': RouteRecordInfo<
+      '/tasks/',
+      '/tasks',
       Record<never, never>,
       Record<never, never>,
       | never
@@ -56,9 +98,45 @@ declare module 'vue-router/auto-routes' {
       views:
         | never
     }
+    'src/pages/agents/index.vue': {
+      routes:
+        | '/agents/'
+      views:
+        | never
+    }
+    'src/pages/billing/index.vue': {
+      routes:
+        | '/billing/'
+      views:
+        | never
+    }
+    'src/pages/dashboard/index.vue': {
+      routes:
+        | '/dashboard/'
+      views:
+        | never
+    }
+    'src/pages/dashboard/ServerDetailsModal.vue': {
+      routes:
+        | '/dashboard/ServerDetailsModal'
+      views:
+        | never
+    }
     'src/pages/example/index.vue': {
       routes:
         | '/example/'
+      views:
+        | never
+    }
+    'src/pages/providers/index.vue': {
+      routes:
+        | '/providers/'
+      views:
+        | never
+    }
+    'src/pages/tasks/index.vue': {
+      routes:
+        | '/tasks/'
       views:
         | never
     }

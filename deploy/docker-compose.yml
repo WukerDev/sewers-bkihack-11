@@ -1,23 +1,37 @@
 version: '3.8'
-
 services:
-  frontend:
-    build: ./frontend
-    depends_on:
-      - backend
-
-  backend:
-    build: ./backend
-    depends_on:
-      - mongodb
-
-  mongodb:
-    image: mongo:latest
+  sqlexpress:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "${MSSQL_SA_PASSWORD}"
+      MSSQL_PID: "Express"
     ports:
-      - "27017:27017"
+      - "1433:1433"
     volumes:
-      - mongodb_data:/data/db
+      - sqlexpress_data:/var/opt/mssql
+  
+  frontend-gateway:
+    build: ./gateways/frontend
+    ports:
+      - "443:443"
+    environment:
+      - ReverseProxy__Clusters__sewersCluster__Destinations__sewersDestination__Address=http://sewers:1300/
+      - ReverseProxy__Clusters__portalCluster__Destinations__portalDestination__Address=http://portal:13001/
+  
+  portal:
+    build: ./portal
+    ports:
+      - "13001:13001"
+    depends_on:
+      - sewers
 
+  sewers:
+    build: ./services/sewers/
+    ports:
+      - "13000:1300"
+    depends_on:
+      - sqlexpress
 
 volumes:
-  mongodb_data:
+  sqlexpress_data:
