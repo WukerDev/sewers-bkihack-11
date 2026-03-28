@@ -1,23 +1,26 @@
 version: '3.8'
-
 services:
+  sqlexpress:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "${MSSQL_SA_PASSWORD}"
+      MSSQL_PID: "Express"
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlexpress_data:/var/opt/mssql
+  
   frontend:
     build: ./frontend
     depends_on:
-      - backend
+      - sewers
 
-  backend:
-    build: ./backend
+  sewers:
+    build: ./services/sewers/
     depends_on:
-      - mongodb
-
-  mongodb:
-    image: mongo:latest
-    ports:
-      - "27017:27017"
-    volumes:
-      - mongodb_data:/data/db
+      - sqlexpress
 
 
 volumes:
-  mongodb_data:
+  sqlexpress_data:

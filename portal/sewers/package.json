@@ -12,12 +12,14 @@
     "lint": "eslint",
     "lint:fix": "eslint --fix",
     "mcp": "ruler apply",
-    "mcp:revert": "ruler revert"
-  },
+    "mcp:revert": "ruler revert",
+"generate": "protoc --plugin=protoc-gen-ts_proto=.\\node_modules\\.bin\\protoc-gen-ts_proto.cmd --ts_proto_out=./src/proto -I ../../protos ../../protos/main.proto --ts_proto_opt=esModuleInterop=true" },
   "dependencies": {
     "@fontsource/roboto": "^5.2.10",
     "@mdi/font": "7.4.47",
+    "leaflet": "^1.9.4",
     "pinia": "^3.0.4",
+    "ts-proto": "^2.11.6",
     "vue": "^3.5.30",
     "vue-i18n": "^11.3.0",
     "vue-router": "^4.6.4",
@@ -26,6 +28,7 @@
   "devDependencies": {
     "@intellectronica/ruler": "^0.3.37",
     "@tsconfig/node22": "^22.0.5",
+    "@types/leaflet": "^1.9.21",
     "@types/node": "^24.12.0",
     "@vitejs/plugin-vue": "^6.0.5",
     "@vue/tsconfig": "^0.9.1",
