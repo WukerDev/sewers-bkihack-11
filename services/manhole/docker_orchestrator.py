@@ -1,18 +1,16 @@
 import docker
 import os
 import logging
+import main
 
 client = docker.from_env()
 
 def run_task_container(image, command, task_id, gpu_id=0):
-    # Uruchamia odizolowany kontener z zadaniem AI.
-    data_path = os.path.abspath("./data")
-    output_path = os.path.abspath("./output")
-    os.makedirs(data_path, exist_ok=True)
-    os.makedirs(output_path, exist_ok=True)
-
+    client = docker.from_env()
+    main.NODE_STATUS = "busy" # Zmieniamy status na zajęty
+    
     try:
-        logging.info(f"🐳 Start kontenera {task_id}")
+        logging.info(f"⚙️ Uruchamiam zadanie {task_id}...")
         container = client.containers.run(
             image=image,
             command=command,
@@ -28,15 +26,7 @@ def run_task_container(image, command, task_id, gpu_id=0):
             nano_cpus=4000000000, # Limit 4 rdzeni (w nanosekundach)
             detach=True
         )
-        
-        result = container.wait(timeout=3600) # Timeout 1h dla bezpieczeństwa
-        logs = container.logs().decode('utf-8')
-        container.remove()
-        
-        return {
-            "status": "completed" if result['StatusCode'] == 0 else "failed",
-            "logs": logs
-        }
-    except Exception as e:
-        logging.error(f"❌ Błąd Dockera: {e}")
-        return {"status": "error", "error": str(e)}
+        container.wait()
+        return {"status": "success"}
+    finally:
+        main.NODE_STATUS = "free"

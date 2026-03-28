@@ -25,7 +25,7 @@ if _version_not_supported:
     )
 
 
-class HeartbeatStub(object):
+class NodeMonitorStub(object):
     """Missing associated documentation comment in .proto file."""
 
     def __init__(self, channel):
@@ -34,43 +34,59 @@ class HeartbeatStub(object):
         Args:
             channel: A grpc.Channel.
         """
-        self.Heartbeat = channel.unary_unary(
-                '/manhole.Heartbeat/Heartbeat',
-                request_serializer=manhole__pb2.HeartbeatRequest.SerializeToString,
-                response_deserializer=manhole__pb2.HeartbeatResponse.FromString,
+        self.GetHardwareStaticInfo = channel.unary_unary(
+                '/manhole.NodeMonitor/GetHardwareStaticInfo',
+                request_serializer=manhole__pb2.Empty.SerializeToString,
+                response_deserializer=manhole__pb2.HardwareStaticInfo.FromString,
+                _registered_method=True)
+        self.StreamDynamicStats = channel.unary_stream(
+                '/manhole.NodeMonitor/StreamDynamicStats',
+                request_serializer=manhole__pb2.Empty.SerializeToString,
+                response_deserializer=manhole__pb2.DynamicStatsResponse.FromString,
                 _registered_method=True)
 
 
-class HeartbeatServicer(object):
+class NodeMonitorServicer(object):
     """Missing associated documentation comment in .proto file."""
 
-    def Heartbeat(self, request, context):
+    def GetHardwareStaticInfo(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def StreamDynamicStats(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
 
-def add_HeartbeatServicer_to_server(servicer, server):
+def add_NodeMonitorServicer_to_server(servicer, server):
     rpc_method_handlers = {
-            'Heartbeat': grpc.unary_unary_rpc_method_handler(
-                    servicer.Heartbeat,
-                    request_deserializer=manhole__pb2.HeartbeatRequest.FromString,
-                    response_serializer=manhole__pb2.HeartbeatResponse.SerializeToString,
+            'GetHardwareStaticInfo': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetHardwareStaticInfo,
+                    request_deserializer=manhole__pb2.Empty.FromString,
+                    response_serializer=manhole__pb2.HardwareStaticInfo.SerializeToString,
+            ),
+            'StreamDynamicStats': grpc.unary_stream_rpc_method_handler(
+                    servicer.StreamDynamicStats,
+                    request_deserializer=manhole__pb2.Empty.FromString,
+                    response_serializer=manhole__pb2.DynamicStatsResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'manhole.Heartbeat', rpc_method_handlers)
+            'manhole.NodeMonitor', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
-    server.add_registered_method_handlers('manhole.Heartbeat', rpc_method_handlers)
+    server.add_registered_method_handlers('manhole.NodeMonitor', rpc_method_handlers)
 
 
  # This class is part of an EXPERIMENTAL API.
-class Heartbeat(object):
+class NodeMonitor(object):
     """Missing associated documentation comment in .proto file."""
 
     @staticmethod
-    def Heartbeat(request,
+    def GetHardwareStaticInfo(request,
             target,
             options=(),
             channel_credentials=None,
@@ -83,9 +99,36 @@ class Heartbeat(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/manhole.Heartbeat/Heartbeat',
-            manhole__pb2.HeartbeatRequest.SerializeToString,
-            manhole__pb2.HeartbeatResponse.FromString,
+            '/manhole.NodeMonitor/GetHardwareStaticInfo',
+            manhole__pb2.Empty.SerializeToString,
+            manhole__pb2.HardwareStaticInfo.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def StreamDynamicStats(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_stream(
+            request,
+            target,
+            '/manhole.NodeMonitor/StreamDynamicStats',
+            manhole__pb2.Empty.SerializeToString,
+            manhole__pb2.DynamicStatsResponse.FromString,
             options,
             channel_credentials,
             insecure,

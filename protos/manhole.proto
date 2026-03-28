@@ -1,32 +1,47 @@
 syntax = "proto3";
-package  manhole;
+package manhole;
 
-option csharp_namespace = "Sewers.ManholeGenerated";
+message Empty {}
 
-message CpuUsageInfo {
+message GpuStatic {
+    int32 gpu_id = 1;      // Id liczone od 0
+    string model = 2;      // np. "NVIDIA GeForce RTX 3060"
+    double vram_gb = 3;    // W GB, zgodnie z Twoją klasą C# (double Vram)
+}
+
+message CpuStatic {
+    int32 cpu_id = 1;      // Id liczone od 0
+    string model = 2;      // np. "Intel(R) Core(TM) i7-10750H"
+    int32 threads = 3;     // Łączna liczba wątków tej sztuki procesora
+}
+
+message HardwareStaticInfo {
+    string node_id = 1;
+    uint64 total_ram_bytes = 2;
+    repeated CpuStatic cpus = 3;
+    repeated GpuStatic gpus = 4;
+}
+
+message CpuDynamic {
     int32 cpu_id = 1;
-    int32 thread_usage = 2; 
+    double usage_percent = 2; // Średnia z całej sztuki
     double temperature = 3;
 }
 
-message GpuUsageInfo {
+message GpuDynamic {
     int32 gpu_id = 1;
-    double vram_usage = 2; 
+    uint64 vram_used_bytes = 2;
     double temperature = 3;
 }
 
-message HeartbeatRequest {
-    string id = 1;
-    bool status = 2;
-    repeated CpuUsageInfo cpus = 3;
-    repeated GpuUsageInfo gpus = 4;
-    double ram_usage = 5;
+message DynamicStatsResponse {
+    string status = 1;
+    uint64 ram_used_bytes = 2;
+    repeated CpuDynamic cpus = 3;
+    repeated GpuDynamic gpus = 4;
 }
 
-message HeartbeatResponse{
-    bool success = 1;
-}
-
-service Heartbeat{
-    rpc Heartbeat (HeartbeatRequest) returns (HeartbeatResponse);
+service NodeMonitor {
+    rpc GetHardwareStaticInfo (Empty) returns (HardwareStaticInfo);
+    rpc StreamDynamicStats (Empty) returns (stream DynamicStatsResponse);
 }

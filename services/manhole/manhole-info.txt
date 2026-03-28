@@ -1,3 +1,20 @@
+Jak uruchomić:
+
+Terminal1:
+cd sewers-bkihack-11
+python -m grpc_tools.protoc -I./protos --python_out=./services/manhole --grpc_python_out=./services/manhole ./protos/manhole.proto
+
+Terminal2:
+cd sewers-bkihack-11/services/manhole
+python main.py
+
+Terminal3:
+cd sewers-bkihack-11/services/manhole
+python test_brain_client.py
+
+
+
+
 Struktura:
 
 manhole/
