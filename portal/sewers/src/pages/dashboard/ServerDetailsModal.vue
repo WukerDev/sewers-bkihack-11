@@ -95,14 +95,14 @@
                         </div>
                         <div class="d-flex align-baseline">
                           <span class="price-val-hero text-h4 font-weight-black text-blue-darken-4">
-                            {{ formatMonthlyPLN(server.pricePerTeraflop) }}
+                            {{ formatMonthlyPLN(server.pricePerTeraflopDay) }}
                           </span>
                           <span class="price-unit-hero text-subtitle-2 text-grey-darken-1 ml-1">/mc</span>
                         </div>
                       </div>
 
                       <div class="price-usd-badge text-caption text-grey-darken-1 font-weight-medium bg-white px-2 py-1 rounded-lg border">
-                        ${{ (server.pricePerTeraflop * 720).toFixed(0) }}/mc
+                        ${{ (server.pricePerTeraflopDay * 720).toFixed(0) }}/mc
                       </div>
                     </div>
 
@@ -121,12 +121,12 @@
 
                       <div class="savings-glow-tag text-caption font-weight-bold">
                         <v-icon size="14" class="mr-1">mdi-trending-down</v-icon>
-                        Taniej o {{ calculatePercent(server.pricePerTeraflop) }}%
+                        Taniej o {{ calculatePercent(server.pricePerTeraflopDay) }}%
                       </div>
                     </div>
 
                     <div class="savings-summary-text text-center text-caption bg-green-lighten-5 text-green-darken-4 pa-2 rounded-lg border-green-lighten-4 border">
-                      Oszczędzasz <strong class="text-green-darken-2 text-body-2">{{ calculateMonthlySavings(server.pricePerTeraflop) }}</strong> miesięcznie
+                      Oszczędzasz <strong class="text-green-darken-2 text-body-2">{{ calculateMonthlySavings(server.pricePerTeraflopDay) }}</strong> miesięcznie
                     </div>
                   </div>
 
@@ -160,31 +160,44 @@ import { useMainStore } from "./store.ts";
 
 const store = useMainStore();
 
-const USD_RATE = 4.02;
-const AWS_PRICE_USD = 0.85; // Cena AWS za h
-const HOURS_IN_MONTH = 360; // 8h * 30 dni
+// --- KONFIGURACJA (Zmień tutaj, a zmieni się wszędzie) ---
+const USD_RATE = 3.72;
+const AWS_PRICE_USD = 0.85; // Cena AWS za 1h
+const HOURS_IN_MONTH = 720; // Standard rynkowy: 24h * 30 dni (użyj 360 jeśli liczysz pół miesiąca)
 
-// Formatowanie ceny miesięcznej
+// 1. Cena w PLN (używana do głównego wyświetlania)
 const formatMonthlyPLN = (hourlyPriceUsd: number) => {
-  const monthlyPln = hourlyPriceUsd * HOURS_IN_MONTH * USD_RATE;
-  return monthlyPln.toLocaleString('pl-PL', {
+  const total = hourlyPriceUsd * HOURS_IN_MONTH * USD_RATE;
+  return total.toLocaleString('pl-PL', {
     style: 'currency',
     currency: 'PLN',
     maximumFractionDigits: 0,
   });
 };
 
-// Obliczanie oszczędności miesięcznej (wartościowo)
+// 2. Cena w USD (do małego dopisku w nawiasie - rozwiązuje Twój problem "5$ = 10zł")
+const formatMonthlyUSD = (hourlyPriceUsd: number) => {
+  const total = hourlyPriceUsd * HOURS_IN_MONTH;
+  return Math.round(total); // Zwraca czystą liczbę, np. 5
+};
+
+// 3. Oszczędności w PLN
 const calculateMonthlySavings = (hourlyUsd: number) => {
   const savings = (AWS_PRICE_USD - hourlyUsd) * HOURS_IN_MONTH * USD_RATE;
-  return savings.toLocaleString('pl-PL', { style: 'currency', currency: 'PLN', maximumFractionDigits: 0 });
+  return savings.toLocaleString('pl-PL', {
+    style: 'currency',
+    currency: 'PLN',
+    maximumFractionDigits: 0
+  });
 };
 
-// Obliczanie procentowe
+// 4. Procenty (bez zmian)
 const calculatePercent = (hourlyUsd: number) => {
-  return Math.round(((AWS_PRICE_USD - hourlyUsd) / AWS_PRICE_USD) * 100);
+  const diff = ((AWS_PRICE_USD - hourlyUsd) / AWS_PRICE_USD) * 100;
+  return Math.round(diff);
 };
 
+// --- LOGIKA STATUSÓW I HARMONOGRAMU ---
 const getTodaySchedule = (server: any) => {
   const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
   const today = days[new Date().getDay()];
