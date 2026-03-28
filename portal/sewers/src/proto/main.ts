@@ -8,6 +8,7 @@
 import { BinaryReader, BinaryWriter } from "@bufbuild/protobuf/wire";
 import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
+import { Duration } from "./google/protobuf/duration";
 
 export const protobufPackage = "sewers";
 
@@ -29,13 +30,34 @@ export interface Cpu {
   threadsUsage: number;
 }
 
+export interface DailyWindow {
+  windowStart: Duration | undefined;
+  windowEnd: Duration | undefined;
+}
+
+export interface WindowSchedule {
+  monday: DailyWindow | undefined;
+  tuesday: DailyWindow | undefined;
+  wednesday: DailyWindow | undefined;
+  thursday: DailyWindow | undefined;
+  friday: DailyWindow | undefined;
+  saturday: DailyWindow | undefined;
+  sunday: DailyWindow | undefined;
+}
+
 export interface Manhole {
   id: string;
-  cpus: Cpu[];
+  name: string;
+  ownerId: string;
+  owner: Company | undefined;
   gpus: Gpu[];
-  ram: string;
-  pricePerTflops: number;
-  status: string;
+  cpus: Cpu[];
+  ram: number;
+  windowSchedule: WindowSchedule | undefined;
+  cityLongitude: number;
+  cityLatitude: number;
+  pricePerTeraflop: number;
+  address: string;
 }
 
 export interface Company {
@@ -524,8 +546,287 @@ export const Cpu: MessageFns<Cpu> = {
   },
 };
 
+function createBaseDailyWindow(): DailyWindow {
+  return { windowStart: undefined, windowEnd: undefined };
+}
+
+export const DailyWindow: MessageFns<DailyWindow> = {
+  encode(message: DailyWindow, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.windowStart !== undefined) {
+      Duration.encode(message.windowStart, writer.uint32(10).fork()).join();
+    }
+    if (message.windowEnd !== undefined) {
+      Duration.encode(message.windowEnd, writer.uint32(18).fork()).join();
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): DailyWindow {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseDailyWindow();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.windowStart = Duration.decode(reader, reader.uint32());
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.windowEnd = Duration.decode(reader, reader.uint32());
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): DailyWindow {
+    return {
+      windowStart: isSet(object.windowStart)
+        ? Duration.fromJSON(object.windowStart)
+        : isSet(object.window_start)
+        ? Duration.fromJSON(object.window_start)
+        : undefined,
+      windowEnd: isSet(object.windowEnd)
+        ? Duration.fromJSON(object.windowEnd)
+        : isSet(object.window_end)
+        ? Duration.fromJSON(object.window_end)
+        : undefined,
+    };
+  },
+
+  toJSON(message: DailyWindow): unknown {
+    const obj: any = {};
+    if (message.windowStart !== undefined) {
+      obj.windowStart = Duration.toJSON(message.windowStart);
+    }
+    if (message.windowEnd !== undefined) {
+      obj.windowEnd = Duration.toJSON(message.windowEnd);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<DailyWindow>, I>>(base?: I): DailyWindow {
+    return DailyWindow.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<DailyWindow>, I>>(object: I): DailyWindow {
+    const message = createBaseDailyWindow();
+    message.windowStart = (object.windowStart !== undefined && object.windowStart !== null)
+      ? Duration.fromPartial(object.windowStart)
+      : undefined;
+    message.windowEnd = (object.windowEnd !== undefined && object.windowEnd !== null)
+      ? Duration.fromPartial(object.windowEnd)
+      : undefined;
+    return message;
+  },
+};
+
+function createBaseWindowSchedule(): WindowSchedule {
+  return {
+    monday: undefined,
+    tuesday: undefined,
+    wednesday: undefined,
+    thursday: undefined,
+    friday: undefined,
+    saturday: undefined,
+    sunday: undefined,
+  };
+}
+
+export const WindowSchedule: MessageFns<WindowSchedule> = {
+  encode(message: WindowSchedule, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.monday !== undefined) {
+      DailyWindow.encode(message.monday, writer.uint32(10).fork()).join();
+    }
+    if (message.tuesday !== undefined) {
+      DailyWindow.encode(message.tuesday, writer.uint32(18).fork()).join();
+    }
+    if (message.wednesday !== undefined) {
+      DailyWindow.encode(message.wednesday, writer.uint32(26).fork()).join();
+    }
+    if (message.thursday !== undefined) {
+      DailyWindow.encode(message.thursday, writer.uint32(34).fork()).join();
+    }
+    if (message.friday !== undefined) {
+      DailyWindow.encode(message.friday, writer.uint32(42).fork()).join();
+    }
+    if (message.saturday !== undefined) {
+      DailyWindow.encode(message.saturday, writer.uint32(50).fork()).join();
+    }
+    if (message.sunday !== undefined) {
+      DailyWindow.encode(message.sunday, writer.uint32(58).fork()).join();
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): WindowSchedule {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseWindowSchedule();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.monday = DailyWindow.decode(reader, reader.uint32());
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.tuesday = DailyWindow.decode(reader, reader.uint32());
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.wednesday = DailyWindow.decode(reader, reader.uint32());
+          continue;
+        }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
+
+          message.thursday = DailyWindow.decode(reader, reader.uint32());
+          continue;
+        }
+        case 5: {
+          if (tag !== 42) {
+            break;
+          }
+
+          message.friday = DailyWindow.decode(reader, reader.uint32());
+          continue;
+        }
+        case 6: {
+          if (tag !== 50) {
+            break;
+          }
+
+          message.saturday = DailyWindow.decode(reader, reader.uint32());
+          continue;
+        }
+        case 7: {
+          if (tag !== 58) {
+            break;
+          }
+
+          message.sunday = DailyWindow.decode(reader, reader.uint32());
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): WindowSchedule {
+    return {
+      monday: isSet(object.monday) ? DailyWindow.fromJSON(object.monday) : undefined,
+      tuesday: isSet(object.tuesday) ? DailyWindow.fromJSON(object.tuesday) : undefined,
+      wednesday: isSet(object.wednesday) ? DailyWindow.fromJSON(object.wednesday) : undefined,
+      thursday: isSet(object.thursday) ? DailyWindow.fromJSON(object.thursday) : undefined,
+      friday: isSet(object.friday) ? DailyWindow.fromJSON(object.friday) : undefined,
+      saturday: isSet(object.saturday) ? DailyWindow.fromJSON(object.saturday) : undefined,
+      sunday: isSet(object.sunday) ? DailyWindow.fromJSON(object.sunday) : undefined,
+    };
+  },
+
+  toJSON(message: WindowSchedule): unknown {
+    const obj: any = {};
+    if (message.monday !== undefined) {
+      obj.monday = DailyWindow.toJSON(message.monday);
+    }
+    if (message.tuesday !== undefined) {
+      obj.tuesday = DailyWindow.toJSON(message.tuesday);
+    }
+    if (message.wednesday !== undefined) {
+      obj.wednesday = DailyWindow.toJSON(message.wednesday);
+    }
+    if (message.thursday !== undefined) {
+      obj.thursday = DailyWindow.toJSON(message.thursday);
+    }
+    if (message.friday !== undefined) {
+      obj.friday = DailyWindow.toJSON(message.friday);
+    }
+    if (message.saturday !== undefined) {
+      obj.saturday = DailyWindow.toJSON(message.saturday);
+    }
+    if (message.sunday !== undefined) {
+      obj.sunday = DailyWindow.toJSON(message.sunday);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<WindowSchedule>, I>>(base?: I): WindowSchedule {
+    return WindowSchedule.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<WindowSchedule>, I>>(object: I): WindowSchedule {
+    const message = createBaseWindowSchedule();
+    message.monday = (object.monday !== undefined && object.monday !== null)
+      ? DailyWindow.fromPartial(object.monday)
+      : undefined;
+    message.tuesday = (object.tuesday !== undefined && object.tuesday !== null)
+      ? DailyWindow.fromPartial(object.tuesday)
+      : undefined;
+    message.wednesday = (object.wednesday !== undefined && object.wednesday !== null)
+      ? DailyWindow.fromPartial(object.wednesday)
+      : undefined;
+    message.thursday = (object.thursday !== undefined && object.thursday !== null)
+      ? DailyWindow.fromPartial(object.thursday)
+      : undefined;
+    message.friday = (object.friday !== undefined && object.friday !== null)
+      ? DailyWindow.fromPartial(object.friday)
+      : undefined;
+    message.saturday = (object.saturday !== undefined && object.saturday !== null)
+      ? DailyWindow.fromPartial(object.saturday)
+      : undefined;
+    message.sunday = (object.sunday !== undefined && object.sunday !== null)
+      ? DailyWindow.fromPartial(object.sunday)
+      : undefined;
+    return message;
+  },
+};
+
 function createBaseManhole(): Manhole {
-  return { id: "", cpus: [], gpus: [], ram: "", pricePerTflops: 0, status: "" };
+  return {
+    id: "",
+    name: "",
+    ownerId: "",
+    owner: undefined,
+    gpus: [],
+    cpus: [],
+    ram: 0,
+    windowSchedule: undefined,
+    cityLongitude: 0,
+    cityLatitude: 0,
+    pricePerTeraflop: 0,
+    address: "",
+  };
 }
 
 export const Manhole: MessageFns<Manhole> = {
@@ -533,20 +834,38 @@ export const Manhole: MessageFns<Manhole> = {
     if (message.id !== "") {
       writer.uint32(10).string(message.id);
     }
-    for (const v of message.cpus) {
-      Cpu.encode(v!, writer.uint32(18).fork()).join();
+    if (message.name !== "") {
+      writer.uint32(18).string(message.name);
+    }
+    if (message.ownerId !== "") {
+      writer.uint32(26).string(message.ownerId);
+    }
+    if (message.owner !== undefined) {
+      Company.encode(message.owner, writer.uint32(34).fork()).join();
     }
     for (const v of message.gpus) {
-      Gpu.encode(v!, writer.uint32(26).fork()).join();
+      Gpu.encode(v!, writer.uint32(42).fork()).join();
     }
-    if (message.ram !== "") {
-      writer.uint32(34).string(message.ram);
+    for (const v of message.cpus) {
+      Cpu.encode(v!, writer.uint32(50).fork()).join();
     }
-    if (message.pricePerTflops !== 0) {
-      writer.uint32(41).double(message.pricePerTflops);
+    if (message.ram !== 0) {
+      writer.uint32(57).double(message.ram);
     }
-    if (message.status !== "") {
-      writer.uint32(50).string(message.status);
+    if (message.windowSchedule !== undefined) {
+      WindowSchedule.encode(message.windowSchedule, writer.uint32(66).fork()).join();
+    }
+    if (message.cityLongitude !== 0) {
+      writer.uint32(73).double(message.cityLongitude);
+    }
+    if (message.cityLatitude !== 0) {
+      writer.uint32(81).double(message.cityLatitude);
+    }
+    if (message.pricePerTeraflop !== 0) {
+      writer.uint32(89).double(message.pricePerTeraflop);
+    }
+    if (message.address !== "") {
+      writer.uint32(98).string(message.address);
     }
     return writer;
   },
@@ -571,7 +890,7 @@ export const Manhole: MessageFns<Manhole> = {
             break;
           }
 
-          message.cpus.push(Cpu.decode(reader, reader.uint32()));
+          message.name = reader.string();
           continue;
         }
         case 3: {
@@ -579,7 +898,7 @@ export const Manhole: MessageFns<Manhole> = {
             break;
           }
 
-          message.gpus.push(Gpu.decode(reader, reader.uint32()));
+          message.ownerId = reader.string();
           continue;
         }
         case 4: {
@@ -587,15 +906,15 @@ export const Manhole: MessageFns<Manhole> = {
             break;
           }
 
-          message.ram = reader.string();
+          message.owner = Company.decode(reader, reader.uint32());
           continue;
         }
         case 5: {
-          if (tag !== 41) {
+          if (tag !== 42) {
             break;
           }
 
-          message.pricePerTflops = reader.double();
+          message.gpus.push(Gpu.decode(reader, reader.uint32()));
           continue;
         }
         case 6: {
@@ -603,7 +922,55 @@ export const Manhole: MessageFns<Manhole> = {
             break;
           }
 
-          message.status = reader.string();
+          message.cpus.push(Cpu.decode(reader, reader.uint32()));
+          continue;
+        }
+        case 7: {
+          if (tag !== 57) {
+            break;
+          }
+
+          message.ram = reader.double();
+          continue;
+        }
+        case 8: {
+          if (tag !== 66) {
+            break;
+          }
+
+          message.windowSchedule = WindowSchedule.decode(reader, reader.uint32());
+          continue;
+        }
+        case 9: {
+          if (tag !== 73) {
+            break;
+          }
+
+          message.cityLongitude = reader.double();
+          continue;
+        }
+        case 10: {
+          if (tag !== 81) {
+            break;
+          }
+
+          message.cityLatitude = reader.double();
+          continue;
+        }
+        case 11: {
+          if (tag !== 89) {
+            break;
+          }
+
+          message.pricePerTeraflop = reader.double();
+          continue;
+        }
+        case 12: {
+          if (tag !== 98) {
+            break;
+          }
+
+          message.address = reader.string();
           continue;
         }
       }
@@ -618,15 +985,37 @@ export const Manhole: MessageFns<Manhole> = {
   fromJSON(object: any): Manhole {
     return {
       id: isSet(object.id) ? globalThis.String(object.id) : "",
-      cpus: globalThis.Array.isArray(object?.cpus) ? object.cpus.map((e: any) => Cpu.fromJSON(e)) : [],
+      name: isSet(object.name) ? globalThis.String(object.name) : "",
+      ownerId: isSet(object.ownerId)
+        ? globalThis.String(object.ownerId)
+        : isSet(object.owner_id)
+        ? globalThis.String(object.owner_id)
+        : "",
+      owner: isSet(object.owner) ? Company.fromJSON(object.owner) : undefined,
       gpus: globalThis.Array.isArray(object?.gpus) ? object.gpus.map((e: any) => Gpu.fromJSON(e)) : [],
-      ram: isSet(object.ram) ? globalThis.String(object.ram) : "",
-      pricePerTflops: isSet(object.pricePerTflops)
-        ? globalThis.Number(object.pricePerTflops)
-        : isSet(object.price_per_tflops)
-        ? globalThis.Number(object.price_per_tflops)
+      cpus: globalThis.Array.isArray(object?.cpus) ? object.cpus.map((e: any) => Cpu.fromJSON(e)) : [],
+      ram: isSet(object.ram) ? globalThis.Number(object.ram) : 0,
+      windowSchedule: isSet(object.windowSchedule)
+        ? WindowSchedule.fromJSON(object.windowSchedule)
+        : isSet(object.window_schedule)
+        ? WindowSchedule.fromJSON(object.window_schedule)
+        : undefined,
+      cityLongitude: isSet(object.cityLongitude)
+        ? globalThis.Number(object.cityLongitude)
+        : isSet(object.city_longitude)
+        ? globalThis.Number(object.city_longitude)
         : 0,
-      status: isSet(object.status) ? globalThis.String(object.status) : "",
+      cityLatitude: isSet(object.cityLatitude)
+        ? globalThis.Number(object.cityLatitude)
+        : isSet(object.city_latitude)
+        ? globalThis.Number(object.city_latitude)
+        : 0,
+      pricePerTeraflop: isSet(object.pricePerTeraflop)
+        ? globalThis.Number(object.pricePerTeraflop)
+        : isSet(object.price_per_teraflop)
+        ? globalThis.Number(object.price_per_teraflop)
+        : 0,
+      address: isSet(object.address) ? globalThis.String(object.address) : "",
     };
   },
 
@@ -635,20 +1024,38 @@ export const Manhole: MessageFns<Manhole> = {
     if (message.id !== "") {
       obj.id = message.id;
     }
-    if (message.cpus?.length) {
-      obj.cpus = message.cpus.map((e) => Cpu.toJSON(e));
+    if (message.name !== "") {
+      obj.name = message.name;
+    }
+    if (message.ownerId !== "") {
+      obj.ownerId = message.ownerId;
+    }
+    if (message.owner !== undefined) {
+      obj.owner = Company.toJSON(message.owner);
     }
     if (message.gpus?.length) {
       obj.gpus = message.gpus.map((e) => Gpu.toJSON(e));
     }
-    if (message.ram !== "") {
+    if (message.cpus?.length) {
+      obj.cpus = message.cpus.map((e) => Cpu.toJSON(e));
+    }
+    if (message.ram !== 0) {
       obj.ram = message.ram;
     }
-    if (message.pricePerTflops !== 0) {
-      obj.pricePerTflops = message.pricePerTflops;
+    if (message.windowSchedule !== undefined) {
+      obj.windowSchedule = WindowSchedule.toJSON(message.windowSchedule);
     }
-    if (message.status !== "") {
-      obj.status = message.status;
+    if (message.cityLongitude !== 0) {
+      obj.cityLongitude = message.cityLongitude;
+    }
+    if (message.cityLatitude !== 0) {
+      obj.cityLatitude = message.cityLatitude;
+    }
+    if (message.pricePerTeraflop !== 0) {
+      obj.pricePerTeraflop = message.pricePerTeraflop;
+    }
+    if (message.address !== "") {
+      obj.address = message.address;
     }
     return obj;
   },
@@ -659,11 +1066,21 @@ export const Manhole: MessageFns<Manhole> = {
   fromPartial<I extends Exact<DeepPartial<Manhole>, I>>(object: I): Manhole {
     const message = createBaseManhole();
     message.id = object.id ?? "";
-    message.cpus = object.cpus?.map((e) => Cpu.fromPartial(e)) || [];
+    message.name = object.name ?? "";
+    message.ownerId = object.ownerId ?? "";
+    message.owner = (object.owner !== undefined && object.owner !== null)
+      ? Company.fromPartial(object.owner)
+      : undefined;
     message.gpus = object.gpus?.map((e) => Gpu.fromPartial(e)) || [];
-    message.ram = object.ram ?? "";
-    message.pricePerTflops = object.pricePerTflops ?? 0;
-    message.status = object.status ?? "";
+    message.cpus = object.cpus?.map((e) => Cpu.fromPartial(e)) || [];
+    message.ram = object.ram ?? 0;
+    message.windowSchedule = (object.windowSchedule !== undefined && object.windowSchedule !== null)
+      ? WindowSchedule.fromPartial(object.windowSchedule)
+      : undefined;
+    message.cityLongitude = object.cityLongitude ?? 0;
+    message.cityLatitude = object.cityLatitude ?? 0;
+    message.pricePerTeraflop = object.pricePerTeraflop ?? 0;
+    message.address = object.address ?? "";
     return message;
   },
 };
