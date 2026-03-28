@@ -11,16 +11,27 @@ services:
     volumes:
       - sqlexpress_data:/var/opt/mssql
   
-  frontend:
-    build: ./frontend
+  frontend-gateway:
+    build: ./gateways/frontend
+    ports:
+      - "443:443"
+    environment:
+      - ReverseProxy__Clusters__sewersCluster__Destinations__sewersDestination__Address=http://sewers:1300/
+      - ReverseProxy__Clusters__portalCluster__Destinations__portalDestination__Address=http://portal:13001/
+  
+  portal:
+    build: ./portal
+    ports:
+      - "13001:13001"
     depends_on:
       - sewers
 
   sewers:
     build: ./services/sewers/
+    ports:
+      - "13000:1300"
     depends_on:
       - sqlexpress
-
 
 volumes:
   sqlexpress_data:

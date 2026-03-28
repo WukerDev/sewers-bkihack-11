@@ -2,4 +2,5 @@
   <Folder Name="/services/">
     <Project Path="services/sewers/sewers.csproj" />
   </Folder>
+  <Project Path="gateways/frontend/frontend.csproj" />
 </Solution>
