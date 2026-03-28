@@ -37,21 +37,21 @@
       >
         <v-row>
           <v-col
-            v-for="server in store.selectedCompany.servers"
+            v-for="server in store.selectedCompany.manholes"
             :key="server.id"
             cols="12"
             md="6"
           >
-            <v-card class="aero-server-item">
+            <v-card class="aero-server-item h-100 d-flex flex-column">
               <div class="gloss-overlay"></div>
-              <div class="relative-content pa-4">
+              <div class="relative-content pa-4 flex-grow-1 d-flex flex-column">
                 <div class="d-flex justify-space-between align-start mb-3">
                   <div>
                     <div
                       class="text-h6 font-weight-black text-blue-darken-4 mb-0"
                       style="line-height: 1.2"
                     >
-                      {{ server.gpu }}
+                      {{ server.gpus && server.gpus.length > 0 ? server.gpus[0].model : 'Brak GPU' }}
                     </div>
                     <div
                       class="text-caption font-weight-bold text-primary text-uppercase"
@@ -59,61 +59,52 @@
                       Węzeł Obliczeniowy
                     </div>
                   </div>
-                  <div class="aero-status-pill" :class="server.status">
+                  <div class="aero-status-pill available">
                     <div class="status-dot"></div>
-                    {{
-                      server.status === "available" ? "Gotowy" : "Przetwarzanie"
-                    }}
+                      Gotowy
                   </div>
                 </div>
 
                 <div class="spec-grid mb-4">
                   <div class="spec-item truncate-wrapper">
-                    <v-tooltip activator="parent" location="top">{{
-                      server.availability
-                    }}</v-tooltip>
+                    <v-tooltip activator="parent" location="top">Harmonogram pracy: 24/7</v-tooltip>
                     <div class="text-truncate">
-                      <strong>⏱ Dostępność:</strong> {{ server.availability }}
+                      <strong>⏱ Dostępność:</strong> Zależne od Okienka
                     </div>
                   </div>
 
                   <div class="spec-item">
                     <div class="text-truncate">
-                      <strong>💰 Cena:</strong> ${{ server.pricePerTflops }}/h
+                      <strong>💰 Cena:</strong> ${{ server.pricePerTeraflop }}/h
                     </div>
                   </div>
 
                   <div class="spec-item">
                     <div class="text-truncate">
-                      <strong>🧠 RAM:</strong> {{ server.ram }}
+                      <strong>🧠 RAM:</strong> {{ server.ram }} GB
                     </div>
                   </div>
 
                   <div class="spec-item">
                     <div class="text-truncate">
-                      <strong>⚙️ CPU:</strong> {{ server.cpuThreads }}
+                      <strong>⚙️ CPU:</strong> {{ server.cpus && server.cpus.length > 0 ? server.cpus[0].threads : '-' }} Rdzeni
                     </div>
                   </div>
                 </div>
 
-                <div class="gel-progress-wrapper mt-auto">
-                  <div
+                <div class="gel-progress-wrapper mt-auto pt-4 border-top-light">
+                   <div
                     class="d-flex justify-space-between text-caption font-weight-black mb-1 px-1"
                   >
                     <span class="text-blue-grey-darken-3"
-                      >Obciążenie Systemu</span
+                      >Użycie Głównego VRAM</span
                     >
-                    <span class="text-blue-darken-3">{{ server.load }}%</span>
+                    <span class="text-blue-darken-3">{{ server.gpus && server.gpus.length > 0 ? server.gpus[0].vramUsage : 0 }}%</span>
                   </div>
                   <div class="gel-progress-container">
                     <div
-                      class="gel-progress-bar"
-                      :class="
-                        server.status === 'available'
-                          ? 'gel-green'
-                          : 'gel-orange'
-                      "
-                      :style="{ width: server.load + '%' }"
+                      class="gel-progress-bar gel-green"
+                      :style="{ width: (server.gpus && server.gpus.length > 0 ? server.gpus[0].vramUsage : 0) + '%' }"
                     >
                       <div class="gel-shine"></div>
                     </div>
@@ -129,7 +120,6 @@
 </template>
 
 <script setup lang="ts">
-// PRZYWRÓCONO TWOJĄ ORYGINALNĄ ŚCIEŻKĘ
 import { useMainStore } from "./store.ts";
 
 const store = useMainStore();
@@ -207,6 +197,10 @@ const store = useMainStore();
   grid-template-columns: 1fr 1fr;
   gap: 8px;
   font-size: 0.85rem;
+}
+
+.border-top-light {
+    border-top: 1px solid rgba(0,0,0, 0.05);
 }
 
 /* STATUS PILL */
