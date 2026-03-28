@@ -38,10 +38,10 @@ class NodeMonitorServicer(manhole_pb2_grpc.NodeMonitorServicer):
                 )
                 
                 for c in stats['cpus']:
-                    cpu = response.cpus.add()
-                    cpu.cpu_id = c['cpu_id']
-                    cpu.usage_percent = c['thread_usage']
-                    cpu.temperature = c['temperature']
+                    cpu_item = response.cpus.add()
+                    cpu_item.cpu_id = c['cpu_id']
+                    cpu_item.usage_percent = c['thread_usage'] # To jest teraz średnia z socketu
+                    cpu_item.temperature = c['temperature']
 
                 for g in stats['gpus']:
                     gpu = response.gpus.add()

@@ -1,7 +1,7 @@
 import psutil
 import logging
 
-# Spróbuj zaimportować bibliotekę NVIDIA, jeśli jest dostępna
+# Spróbuj zaimportować bibliotekę NVIDIA
 try:
     from pynvml import *
     nvmlInit()
@@ -10,34 +10,39 @@ except Exception:
     HAS_GPU = False
 
 def get_full_stats():
-    """Pobiera kompletne statystyki sprzętowe."""
-    
-    # 1. RAM (w bajtach)
     mem = psutil.virtual_memory()
     
-    # 2. CPU - zużycie na każdy rdzeń osobno
-    # interval=None sprawia, że nie blokujemy wątku (bierze dane od ostatniego wywołania)
-    cpu_percents = psutil.cpu_percent(percpu=True)
+    # 1. Pobieramy całkowite zużycie CPU (średnia ze wszystkich rdzeni)
+    # Jeśli masz 1 fizyczny procesor, to interesuje nas jedna wartość globalna.
+    global_cpu_usage = psutil.cpu_percent(interval=None)
     
-    # Temperatura CPU na Windows jest trudna do pobrania przez psutil.
-    # Zazwyczaj zwraca pustą listę. Wstawiamy 0.0 jako fallback.
-    cpu_temps = []
+    # 2. Wykrywanie fizycznych procesorów (Socketów)
+    # Na Windows/Linux 'psutil.cpu_count(logical=False)' to rdzenie.
+    # Aby sprawdzić Sockets (sztuki procesora), używamy sztuczki lub zakładamy 1 dla PC.
+    # W większości bibliotek pythonowych na Windows ciężko o 'sockets' bez WMI.
+    # Przyjmijmy bezpieczne założenie dla Twojej maszyny (1 procesor fizyczny).
+    
+    cpus_data = []
+    
+    # Statystyka dla pierwszego (i zazwyczaj jedynego w PC) fizycznego procesora
+    cpu_temp = 0.0
     try:
         temps = psutil.sensors_temperatures()
+        # Szukamy ogólnej temperatury "Package" (całej sztuki procesora)
         if 'coretemp' in temps:
-            cpu_temps = [t.current for t in temps['coretemp']]
+            cpu_temp = temps['coretemp'][0].current
     except Exception:
         pass
 
-    cpus_data = []
-    for i, usage in enumerate(cpu_percents):
-        cpus_data.append({
-            "cpu_id": i,
-            "thread_usage": usage,
-            "temperature": cpu_temps[i] if i < len(cpu_temps) else 0.0
-        })
+    cpus_data.append({
+        "cpu_id": 0, # Pierwszy fizyczny procesor
+        "thread_usage": global_cpu_usage, # Średnia praca całego procesora
+        "temperature": cpu_temp
+    })
 
-    # 3. GPU (NVIDIA)
+    # Jeśli to serwer dwu-procesorowy (Dual Socket), psutil.cpu_percent(percpu=True) 
+    # musiałby być dzielony na pół, ale dla Twoich testów 1 sztuka jest kluczowa.
+
     gpus_data = []
     if HAS_GPU:
         try:
@@ -55,11 +60,11 @@ def get_full_stats():
                     "temperature": temp
                 })
         except Exception as e:
-            logging.error(f"⚠️ Błąd odczytu GPU: {e}")
+            logging.error(f"⚠️ GPU Error: {e}")
 
     return {
-        "total_ram": mem.total,           # Całkowity RAM (Bajty)
-        "ram_used_bytes": mem.used,       # Użyty RAM (Bajty)
+        "total_ram": mem.total,
+        "ram_used_bytes": mem.used,
         "cpus": cpus_data,
         "gpus": gpus_data
     }
