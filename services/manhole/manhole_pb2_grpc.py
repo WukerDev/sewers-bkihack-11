@@ -34,18 +34,30 @@ class NodeMonitorStub(object):
         Args:
             channel: A grpc.Channel.
         """
-        self.StreamStats = channel.unary_stream(
-                '/manhole.NodeMonitor/StreamStats',
+        self.GetHardwareStaticInfo = channel.unary_unary(
+                '/manhole.NodeMonitor/GetHardwareStaticInfo',
                 request_serializer=manhole__pb2.Empty.SerializeToString,
-                response_deserializer=manhole__pb2.HeartbeatResponse.FromString,
+                response_deserializer=manhole__pb2.HardwareStaticInfo.FromString,
+                _registered_method=True)
+        self.StreamDynamicStats = channel.unary_stream(
+                '/manhole.NodeMonitor/StreamDynamicStats',
+                request_serializer=manhole__pb2.Empty.SerializeToString,
+                response_deserializer=manhole__pb2.DynamicStatsResponse.FromString,
                 _registered_method=True)
 
 
 class NodeMonitorServicer(object):
     """Missing associated documentation comment in .proto file."""
 
-    def StreamStats(self, request, context):
-        """Klient (Mózg) wywołuje raz, a Serwer (Manhole) strumieniuje dane póki połączenie trwa
+    def GetHardwareStaticInfo(self, request, context):
+        """Pobierz konfigurację sprzętową (wywołaj raz)
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def StreamDynamicStats(self, request, context):
+        """Subskrybuj strumień statystyk (wywołuj co sekundę)
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -54,10 +66,15 @@ class NodeMonitorServicer(object):
 
 def add_NodeMonitorServicer_to_server(servicer, server):
     rpc_method_handlers = {
-            'StreamStats': grpc.unary_stream_rpc_method_handler(
-                    servicer.StreamStats,
+            'GetHardwareStaticInfo': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetHardwareStaticInfo,
                     request_deserializer=manhole__pb2.Empty.FromString,
-                    response_serializer=manhole__pb2.HeartbeatResponse.SerializeToString,
+                    response_serializer=manhole__pb2.HardwareStaticInfo.SerializeToString,
+            ),
+            'StreamDynamicStats': grpc.unary_stream_rpc_method_handler(
+                    servicer.StreamDynamicStats,
+                    request_deserializer=manhole__pb2.Empty.FromString,
+                    response_serializer=manhole__pb2.DynamicStatsResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -71,7 +88,34 @@ class NodeMonitor(object):
     """Missing associated documentation comment in .proto file."""
 
     @staticmethod
-    def StreamStats(request,
+    def GetHardwareStaticInfo(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/manhole.NodeMonitor/GetHardwareStaticInfo',
+            manhole__pb2.Empty.SerializeToString,
+            manhole__pb2.HardwareStaticInfo.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def StreamDynamicStats(request,
             target,
             options=(),
             channel_credentials=None,
@@ -84,9 +128,9 @@ class NodeMonitor(object):
         return grpc.experimental.unary_stream(
             request,
             target,
-            '/manhole.NodeMonitor/StreamStats',
+            '/manhole.NodeMonitor/StreamDynamicStats',
             manhole__pb2.Empty.SerializeToString,
-            manhole__pb2.HeartbeatResponse.FromString,
+            manhole__pb2.DynamicStatsResponse.FromString,
             options,
             channel_credentials,
             insecure,

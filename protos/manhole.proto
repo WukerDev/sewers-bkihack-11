@@ -1,32 +1,41 @@
 syntax = "proto3";
 package manhole;
 
-option csharp_namespace = "Sewers.ManholeGenerated";
-
-// Dodajemy puste zapytanie, bo serwer po prostu czeka na "zaczepkę"
 message Empty {}
 
-message CpuUsageInfo {
+// 1. DANE STATYCZNE (Wysyłane raz na początku)
+message HardwareStaticInfo {
+    string node_id = 1;
+    uint64 total_ram_bytes = 2;
+    int32 cpu_count = 3;
+    int32 gpu_count = 4;
+}
+
+// 2. DANE DYNAMICZNE (Strumieniowane co sekundę)
+message CpuDynamic {
     int32 cpu_id = 1;
-    int32 thread_usage = 2; 
+    double usage_percent = 2;
     double temperature = 3;
 }
 
-message GpuUsageInfo {
+message GpuDynamic {
     int32 gpu_id = 1;
-    double vram_usage = 2; 
-    double temperature = 3;
+    double vram_used_bytes = 2;
+    double load_percent = 3;
+    double temperature = 4;
 }
 
-message HeartbeatResponse {
-    string id = 1;
-    string status = 2; // "free", "busy", "error"
-    repeated CpuUsageInfo cpus = 3;
-    repeated GpuUsageInfo gpus = 4;
-    double ram_usage = 5;
+message DynamicStatsResponse {
+    string status = 1; // "free" / "busy"
+    uint64 ram_used_bytes = 2;
+    repeated CpuDynamic cpus = 3;
+    repeated GpuDynamic gpus = 4;
 }
 
 service NodeMonitor {
-    // Klient (Mózg) wywołuje raz, a Serwer (Manhole) strumieniuje dane póki połączenie trwa
-    rpc StreamStats (Empty) returns (stream HeartbeatResponse);
+    // Pobierz konfigurację sprzętową (wywołaj raz)
+    rpc GetHardwareStaticInfo (Empty) returns (HardwareStaticInfo);
+    
+    // Subskrybuj strumień statystyk (wywołuj co sekundę)
+    rpc StreamDynamicStats (Empty) returns (stream DynamicStatsResponse);
 }
