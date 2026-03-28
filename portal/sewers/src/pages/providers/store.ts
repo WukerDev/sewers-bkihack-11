@@ -2,13 +2,15 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 
 export interface NodeMetrics {
-  id: string
-  name: string
-  uptime: string
-  powerUsage: string
-  vramUsage: string
-  gpuTemp: string
-  status: 'online' | 'offline' | 'maintenance'
+  id: string;
+  name: string;
+  uptime: string;
+  powerUsage: string;
+  vramUsage: string;
+  gpuTemp: string;
+  cpuUsage?: string;
+  netLatency?: string;
+  status: 'online' | 'offline' | 'maintenance';
 }
 
 export const useProvidersStore = defineStore('providers', () => {

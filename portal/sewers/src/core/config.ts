@@ -112,16 +112,16 @@ export const useConfigStore = defineStore('config', () => {
       { value: "simulations", label: "Symulacje inżynieryjne (CAE)", icon: "mdi-molecule", description: "Dynamika płynów i badania naukowe." }
     ],
     availableModels: ["Bielik-11B", "Llama-3-8B", "Mistral-7B", "Mixtral-8x7B"],
-    clusters: [
+clusters: [
       {
         id: 'cl1', name: 'Warszawa', lat: 52.2297, lng: 21.0122, status: 'available',
         companies: [
           { id: 'c1', name: 'TechCore Data', status: 'available', manholes: [
-            { id: 's1', ram: '128 GB', pricePerTflops: 0.15, status: 'available', cpus: [{ id: 'c-s1', model: 'AMD EPYC', threads: 64, cpuId: 1, temperature: 45, threadsUsage: 10 }], gpus: [{ id: 'g-s1', model: 'RTX 4090', vram: 24, gpuId: 1, temperature: 65, vramUsage: 10 }] },
-            { id: 's2', ram: '64 GB', pricePerTflops: 0.10, status: 'busy', cpus: [{ id: 'c-s2', model: 'Intel Xeon', threads: 32, cpuId: 1, temperature: 55, threadsUsage: 95 }], gpus: [{ id: 'g-s2', model: 'RTX 3090', vram: 24, gpuId: 1, temperature: 80, vramUsage: 95 }] }
+            { id: 's1', ram: 128, pricePerTeraflop: 0.15, status: 'available', cpus: [{ id: 'c-s1', model: 'AMD EPYC', threads: 64, cpuId: 1, temperature: 45, threadsUsage: 10 }], gpus: [{ id: 'g-s1', model: 'RTX 4090', vram: 24, gpuId: 1, temperature: 65, vramUsage: 10 }] },
+            { id: 's2', ram: 64, pricePerTeraflop: 0.10, status: 'busy', cpus: [{ id: 'c-s2', model: 'Intel Xeon', threads: 32, cpuId: 1, temperature: 55, threadsUsage: 95 }], gpus: [{ id: 'g-s2', model: 'RTX 3090', vram: 24, gpuId: 1, temperature: 80, vramUsage: 95 }] }
           ]},
           { id: 'c2', name: 'CyberAI Warsaw', status: 'deploying', manholes: [
-            { id: 's3', ram: '256 GB', pricePerTflops: 0.45, status: 'deploying', cpus: [{ id: 'c-s3', model: 'AMD EPYC', threads: 128, cpuId: 1, temperature: 40, threadsUsage: 100 }], gpus: [{ id: 'g-s3', model: 'A100', vram: 80, gpuId: 1, temperature: 70, vramUsage: 100 }] }
+            { id: 's3', ram: 256, pricePerTeraflop: 0.45, status: 'deploying', cpus: [{ id: 'c-s3', model: 'AMD EPYC', threads: 128, cpuId: 1, temperature: 40, threadsUsage: 100 }], gpus: [{ id: 'g-s3', model: 'A100', vram: 80, gpuId: 1, temperature: 70, vramUsage: 100 }] }
           ]}
         ]
       },
@@ -129,7 +129,7 @@ export const useConfigStore = defineStore('config', () => {
         id: 'cl2', name: 'Kraków', lat: 50.0647, lng: 19.9450, status: 'busy',
         companies: [
           { id: 'c3', name: 'Vistula Render', status: 'busy', manholes: [
-            { id: 's4', ram: '64 GB', pricePerTflops: 0.12, status: 'busy', cpus: [{ id: 'c-s4', model: 'AMD Threadripper', threads: 32, cpuId: 1, temperature: 60, threadsUsage: 90 }], gpus: [{ id: 'g-s4', model: 'RTX 4080', vram: 16, gpuId: 1, temperature: 75, vramUsage: 90 }] }
+            { id: 's4', ram: 64, pricePerTeraflop: 0.12, status: 'busy', cpus: [{ id: 'c-s4', model: 'AMD Threadripper', threads: 32, cpuId: 1, temperature: 60, threadsUsage: 90 }], gpus: [{ id: 'g-s4', model: 'RTX 4080', vram: 16, gpuId: 1, temperature: 75, vramUsage: 90 }] }
           ]}
         ]
       },
@@ -137,13 +137,13 @@ export const useConfigStore = defineStore('config', () => {
         id: 'cl3', name: 'Szczecin', lat: 53.4285, lng: 14.8528, status: 'available',
         companies: [
           { id: 'c4', name: 'Pomerania Compute', status: 'available', manholes: [
-            { id: 's5', ram: '128 GB', pricePerTflops: 0.30, status: 'available', cpus: [{ id: 'c-s5', model: 'AMD EPYC', threads: 64, cpuId: 1, temperature: 50, threadsUsage: 20 }], gpus: [{ id: 'g-s5', model: 'A6000', vram: 48, gpuId: 1, temperature: 60, vramUsage: 20 }] }
+            { id: 's5', ram: 128, pricePerTeraflop: 0.30, status: 'available', cpus: [{ id: 'c-s5', model: 'AMD EPYC', threads: 64, cpuId: 1, temperature: 50, threadsUsage: 20 }], gpus: [{ id: 'g-s5', model: 'A6000', vram: 48, gpuId: 1, temperature: 60, vramUsage: 20 }] }
           ]},
           { id: 'c5', name: 'Szczecin AI', status: 'available', manholes: [
-            { id: 's6', ram: '32 GB', pricePerTflops: 0.08, status: 'available', cpus: [{ id: 'c-s6', model: 'Intel Core', threads: 16, cpuId: 1, temperature: 40, threadsUsage: 5 }], gpus: [{ id: 'g-s6', model: 'RTX 3080', vram: 10, gpuId: 1, temperature: 55, vramUsage: 5 }] }
+            { id: 's6', ram: 32, pricePerTeraflop: 0.08, status: 'available', cpus: [{ id: 'c-s6', model: 'Intel Core', threads: 16, cpuId: 1, temperature: 40, threadsUsage: 5 }], gpus: [{ id: 'g-s6', model: 'RTX 3080', vram: 10, gpuId: 1, temperature: 55, vramUsage: 5 }] }
           ]},
           { id: 'c6', name: 'DeepNode', status: 'offline', manholes: [
-            { id: 's7', ram: '128 GB', pricePerTflops: 0.16, status: 'offline', cpus: [{ id: 'c-s7', model: 'AMD EPYC', threads: 64, cpuId: 1, temperature: 0, threadsUsage: 0 }], gpus: [{ id: 'g-s7', model: 'RTX 4090', vram: 24, gpuId: 1, temperature: 0, vramUsage: 0 }] }
+            { id: 's7', ram: 128, pricePerTeraflop: 0.16, status: 'offline', cpus: [{ id: 'c-s7', model: 'AMD EPYC', threads: 64, cpuId: 1, temperature: 0, threadsUsage: 0 }], gpus: [{ id: 'g-s7', model: 'RTX 4090', vram: 24, gpuId: 1, temperature: 0, vramUsage: 0 }] }
           ]}
         ]
       },
@@ -151,11 +151,11 @@ export const useConfigStore = defineStore('config', () => {
         id: 'cl4', name: 'Wrocław', lat: 51.1079, lng: 17.0385, status: 'deploying',
         companies: [
           { id: 'c7', name: 'Odra Machine Learning', status: 'deploying', manholes: [
-            { id: 's8', ram: '256 GB', pricePerTflops: 0.85, status: 'deploying', cpus: [{ id: 'c-s8', model: 'AMD EPYC', threads: 128, cpuId: 1, temperature: 30, threadsUsage: 0 }], gpus: [{ id: 'g-s8', model: 'H100', vram: 80, gpuId: 1, temperature: 35, vramUsage: 0 }] },
-            { id: 's9', ram: '128 GB', pricePerTflops: 0.16, status: 'deploying', cpus: [{ id: 'c-s9', model: 'AMD EPYC', threads: 64, cpuId: 1, temperature: 30, threadsUsage: 0 }], gpus: [{ id: 'g-s9', model: 'RTX 4090', vram: 24, gpuId: 1, temperature: 35, vramUsage: 0 }] }
+            { id: 's8', ram: 256, pricePerTeraflop: 0.85, status: 'deploying', cpus: [{ id: 'c-s8', model: 'AMD EPYC', threads: 128, cpuId: 1, temperature: 30, threadsUsage: 0 }], gpus: [{ id: 'g-s8', model: 'H100', vram: 80, gpuId: 1, temperature: 35, vramUsage: 0 }] },
+            { id: 's9', ram: 128, pricePerTeraflop: 0.16, status: 'deploying', cpus: [{ id: 'c-s9', model: 'AMD EPYC', threads: 64, cpuId: 1, temperature: 30, threadsUsage: 0 }], gpus: [{ id: 'g-s9', model: 'RTX 4090', vram: 24, gpuId: 1, temperature: 35, vramUsage: 0 }] }
           ]},
           { id: 'c8', name: 'Wrocław Tech Compute', status: 'busy', manholes: [
-            { id: 's10', ram: '64 GB', pricePerTflops: 0.10, status: 'busy', cpus: [{ id: 'c-s10', model: 'Intel Xeon', threads: 32, cpuId: 1, temperature: 65, threadsUsage: 98 }], gpus: [{ id: 'g-s10', model: 'RTX 3090', vram: 24, gpuId: 1, temperature: 82, vramUsage: 98 }] }
+            { id: 's10', ram: 64, pricePerTeraflop: 0.10, status: 'busy', cpus: [{ id: 'c-s10', model: 'Intel Xeon', threads: 32, cpuId: 1, temperature: 65, threadsUsage: 98 }], gpus: [{ id: 'g-s10', model: 'RTX 3090', vram: 24, gpuId: 1, temperature: 82, vramUsage: 98 }] }
           ]}
         ]
       },
@@ -163,11 +163,11 @@ export const useConfigStore = defineStore('config', () => {
         id: 'cl5', name: 'Poznań', lat: 52.4064, lng: 16.9252, status: 'available',
         companies: [
           { id: 'c9', name: 'Warta AI Labs', status: 'available', manholes: [
-            { id: 's11', ram: '128 GB', pricePerTflops: 0.40, status: 'available', cpus: [{ id: 'c-s11', model: 'AMD EPYC', threads: 64, cpuId: 1, temperature: 50, threadsUsage: 60 }], gpus: [{ id: 'g-s11', model: 'A100', vram: 40, gpuId: 1, temperature: 65, vramUsage: 60 }] }
+            { id: 's11', ram: 128, pricePerTeraflop: 0.40, status: 'available', cpus: [{ id: 'c-s11', model: 'AMD EPYC', threads: 64, cpuId: 1, temperature: 50, threadsUsage: 60 }], gpus: [{ id: 'g-s11', model: 'A100', vram: 40, gpuId: 1, temperature: 65, vramUsage: 60 }] }
           ]},
           { id: 'c10', name: 'PyraRender', status: 'busy', manholes: [
-            { id: 's12', ram: '64 GB', pricePerTflops: 0.11, status: 'busy', cpus: [{ id: 'c-s12', model: 'AMD Ryzen', threads: 24, cpuId: 1, temperature: 70, threadsUsage: 100 }], gpus: [{ id: 'g-s12', model: 'RTX 4080', vram: 16, gpuId: 1, temperature: 80, vramUsage: 100 }] },
-            { id: 's13', ram: '64 GB', pricePerTflops: 0.11, status: 'busy', cpus: [{ id: 'c-s13', model: 'AMD Ryzen', threads: 24, cpuId: 1, temperature: 68, threadsUsage: 90 }], gpus: [{ id: 'g-s13', model: 'RTX 4080', vram: 16, gpuId: 1, temperature: 78, vramUsage: 90 }] }
+            { id: 's12', ram: 64, pricePerTeraflop: 0.11, status: 'busy', cpus: [{ id: 'c-s12', model: 'AMD Ryzen', threads: 24, cpuId: 1, temperature: 70, threadsUsage: 100 }], gpus: [{ id: 'g-s12', model: 'RTX 4080', vram: 16, gpuId: 1, temperature: 80, vramUsage: 100 }] },
+            { id: 's13', ram: 64, pricePerTeraflop: 0.11, status: 'busy', cpus: [{ id: 'c-s13', model: 'AMD Ryzen', threads: 24, cpuId: 1, temperature: 68, threadsUsage: 90 }], gpus: [{ id: 'g-s13', model: 'RTX 4080', vram: 16, gpuId: 1, temperature: 78, vramUsage: 90 }] }
           ]}
         ]
       },
@@ -175,10 +175,10 @@ export const useConfigStore = defineStore('config', () => {
         id: 'cl6', name: 'Gdańsk', lat: 54.3520, lng: 18.6466, status: 'offline',
         companies: [
           { id: 'c11', name: 'Tricity Cloud', status: 'offline', manholes: [
-            { id: 's14', ram: '256 GB', pricePerTflops: 0.50, status: 'offline', cpus: [{ id: 'c-s14', model: 'AMD EPYC', threads: 64, cpuId: 1, temperature: 0, threadsUsage: 0 }], gpus: [{ id: 'g-s14', model: 'L40S', vram: 48, gpuId: 1, temperature: 0, vramUsage: 0 }] }
+            { id: 's14', ram: 256, pricePerTeraflop: 0.50, status: 'offline', cpus: [{ id: 'c-s14', model: 'AMD EPYC', threads: 64, cpuId: 1, temperature: 0, threadsUsage: 0 }], gpus: [{ id: 'g-s14', model: 'L40S', vram: 48, gpuId: 1, temperature: 0, vramUsage: 0 }] }
           ]},
           { id: 'c12', name: 'Baltic Node', status: 'offline', manholes: [
-            { id: 's15', ram: '128 GB', pricePerTflops: 0.09, status: 'offline', cpus: [{ id: 'c-s15', model: 'Intel Xeon', threads: 32, cpuId: 1, temperature: 0, threadsUsage: 0 }], gpus: [{ id: 'g-s15', model: 'RTX 3090', vram: 24, gpuId: 1, temperature: 0, vramUsage: 0 }] }
+            { id: 's15', ram: 128, pricePerTeraflop: 0.09, status: 'offline', cpus: [{ id: 'c-s15', model: 'Intel Xeon', threads: 32, cpuId: 1, temperature: 0, threadsUsage: 0 }], gpus: [{ id: 'g-s15', model: 'RTX 3090', vram: 24, gpuId: 1, temperature: 0, vramUsage: 0 }] }
           ]}
         ]
       },
@@ -186,8 +186,8 @@ export const useConfigStore = defineStore('config', () => {
         id: 'cl7', name: 'Łódź', lat: 51.7592, lng: 19.4560, status: 'available',
         companies: [
           { id: 'c13', name: 'Industrial Compute', status: 'available', manholes: [
-            { id: 's16', ram: '256 GB', pricePerTflops: 0.35, status: 'available', cpus: [{ id: 'c-s16', model: 'AMD EPYC', threads: 64, cpuId: 1, temperature: 45, threadsUsage: 10 }], gpus: [{ id: 'g-s16', model: 'A6000 Ada', vram: 48, gpuId: 1, temperature: 55, vramUsage: 10 }] },
-            { id: 's17', ram: '128 GB', pricePerTflops: 0.15, status: 'available', cpus: [{ id: 'c-s17', model: 'AMD EPYC', threads: 64, cpuId: 1, temperature: 50, threadsUsage: 30 }], gpus: [{ id: 'g-s17', model: 'RTX 4090', vram: 24, gpuId: 1, temperature: 62, vramUsage: 30 }] }
+            { id: 's16', ram: 256, pricePerTeraflop: 0.35, status: 'available', cpus: [{ id: 'c-s16', model: 'AMD EPYC', threads: 64, cpuId: 1, temperature: 45, threadsUsage: 10 }], gpus: [{ id: 'g-s16', model: 'A6000 Ada', vram: 48, gpuId: 1, temperature: 55, vramUsage: 10 }] },
+            { id: 's17', ram: 128, pricePerTeraflop: 0.15, status: 'available', cpus: [{ id: 'c-s17', model: 'AMD EPYC', threads: 64, cpuId: 1, temperature: 50, threadsUsage: 30 }], gpus: [{ id: 'g-s17', model: 'RTX 4090', vram: 24, gpuId: 1, temperature: 62, vramUsage: 30 }] }
           ]}
         ]
       },
@@ -195,10 +195,10 @@ export const useConfigStore = defineStore('config', () => {
         id: 'cl8', name: 'Katowice', lat: 50.2649, lng: 19.0238, status: 'available',
         companies: [
           { id: 'c14', name: 'Silesia Data Center', status: 'available', manholes: [
-            { id: 's18', ram: '512 GB', pricePerTflops: 1.20, status: 'available', cpus: [{ id: 'c-s18', model: 'AMD EPYC', threads: 128, cpuId: 1, temperature: 48, threadsUsage: 50 }], gpus: [{ id: 'g-s18', model: 'H100 NVL', vram: 188, gpuId: 1, temperature: 68, vramUsage: 50 }] }
+            { id: 's18', ram: 512, pricePerTeraflop: 1.20, status: 'available', cpus: [{ id: 'c-s18', model: 'AMD EPYC', threads: 128, cpuId: 1, temperature: 48, threadsUsage: 50 }], gpus: [{ id: 'g-s18', model: 'H100 NVL', vram: 188, gpuId: 1, temperature: 68, vramUsage: 50 }] }
           ]},
           { id: 'c15', name: 'KatoRender', status: 'busy', manholes: [
-            { id: 's19', ram: '128 GB', pricePerTflops: 0.14, status: 'busy', cpus: [{ id: 'c-s19', model: 'AMD EPYC', threads: 64, cpuId: 1, temperature: 65, threadsUsage: 100 }], gpus: [{ id: 'g-s19', model: 'RTX 4090', vram: 24, gpuId: 1, temperature: 85, vramUsage: 100 }] }
+            { id: 's19', ram: 128, pricePerTeraflop: 0.14, status: 'busy', cpus: [{ id: 'c-s19', model: 'AMD EPYC', threads: 64, cpuId: 1, temperature: 65, threadsUsage: 100 }], gpus: [{ id: 'g-s19', model: 'RTX 4090', vram: 24, gpuId: 1, temperature: 85, vramUsage: 100 }] }
           ]}
         ]
       },
@@ -206,7 +206,7 @@ export const useConfigStore = defineStore('config', () => {
         id: 'cl9', name: 'Lublin', lat: 51.2465, lng: 22.5684, status: 'available',
         companies: [
           { id: 'c16', name: 'East Node', status: 'available', manholes: [
-            { id: 's20', ram: '128 GB', pricePerTflops: 0.25, status: 'available', cpus: [{ id: 'c-s20', model: 'Intel Xeon', threads: 32, cpuId: 1, temperature: 40, threadsUsage: 5 }], gpus: [{ id: 'g-s20', model: 'V100', vram: 32, gpuId: 1, temperature: 50, vramUsage: 5 }] }
+            { id: 's20', ram: 128, pricePerTeraflop: 0.25, status: 'available', cpus: [{ id: 'c-s20', model: 'Intel Xeon', threads: 32, cpuId: 1, temperature: 40, threadsUsage: 5 }], gpus: [{ id: 'g-s20', model: 'V100', vram: 32, gpuId: 1, temperature: 50, vramUsage: 5 }] }
           ]}
         ]
       },
@@ -214,11 +214,11 @@ export const useConfigStore = defineStore('config', () => {
         id: 'cl10', name: 'Bydgoszcz', lat: 53.1235, lng: 18.0084, status: 'available',
         companies: [
           { id: 'c17', name: 'Brda AI Compute', status: 'available', manholes: [
-            { id: 's21', ram: '256 GB', pricePerTflops: 0.28, status: 'available', cpus: [{ id: 'c-s21', model: 'AMD EPYC', threads: 64, cpuId: 1, temperature: 50, threadsUsage: 35 }], gpus: [{ id: 'g-s21', model: 'A40', vram: 48, gpuId: 1, temperature: 65, vramUsage: 35 }] },
-            { id: 's22', ram: '128 GB', pricePerTflops: 0.15, status: 'available', cpus: [{ id: 'c-s22', model: 'Intel Xeon', threads: 32, cpuId: 1, temperature: 45, threadsUsage: 12 }], gpus: [{ id: 'g-s22', model: 'RTX 4090', vram: 24, gpuId: 1, temperature: 58, vramUsage: 12 }] }
+            { id: 's21', ram: 256, pricePerTeraflop: 0.28, status: 'available', cpus: [{ id: 'c-s21', model: 'AMD EPYC', threads: 64, cpuId: 1, temperature: 50, threadsUsage: 35 }], gpus: [{ id: 'g-s21', model: 'A40', vram: 48, gpuId: 1, temperature: 65, vramUsage: 35 }] },
+            { id: 's22', ram: 128, pricePerTeraflop: 0.15, status: 'available', cpus: [{ id: 'c-s22', model: 'Intel Xeon', threads: 32, cpuId: 1, temperature: 45, threadsUsage: 12 }], gpus: [{ id: 'g-s22', model: 'RTX 4090', vram: 24, gpuId: 1, temperature: 58, vramUsage: 12 }] }
           ]},
           { id: 'c18', name: 'Bydgoszcz Tech Hub', status: 'offline', manholes: [
-            { id: 's23', ram: '64 GB', pricePerTflops: 0.08, status: 'offline', cpus: [{ id: 'c-s23', model: 'AMD Ryzen', threads: 16, cpuId: 1, temperature: 0, threadsUsage: 0 }], gpus: [{ id: 'g-s23', model: 'RTX 3080 Ti', vram: 12, gpuId: 1, temperature: 0, vramUsage: 0 }] }
+            { id: 's23', ram: 64, pricePerTeraflop: 0.08, status: 'offline', cpus: [{ id: 'c-s23', model: 'AMD Ryzen', threads: 16, cpuId: 1, temperature: 0, threadsUsage: 0 }], gpus: [{ id: 'g-s23', model: 'RTX 3080 Ti', vram: 12, gpuId: 1, temperature: 0, vramUsage: 0 }] }
           ]}
         ]
       },
@@ -226,8 +226,8 @@ export const useConfigStore = defineStore('config', () => {
         id: 'cl11', name: 'Toruń', lat: 53.0138, lng: 18.5984, status: 'deploying',
         companies: [
           { id: 'c19', name: 'Copernicus Node', status: 'deploying', manholes: [
-            { id: 's24', ram: '512 GB', pricePerTflops: 0.88, status: 'deploying', cpus: [{ id: 'c-s24', model: 'AMD EPYC', threads: 128, cpuId: 1, temperature: 30, threadsUsage: 0 }], gpus: [{ id: 'g-s24', model: 'H100', vram: 80, gpuId: 1, temperature: 35, vramUsage: 0 }] },
-            { id: 's25', ram: '256 GB', pricePerTflops: 0.42, status: 'deploying', cpus: [{ id: 'c-s25', model: 'AMD EPYC', threads: 64, cpuId: 1, temperature: 30, threadsUsage: 0 }], gpus: [{ id: 'g-s25', model: 'A100', vram: 40, gpuId: 1, temperature: 35, vramUsage: 0 }] }
+            { id: 's24', ram: 512, pricePerTeraflop: 0.88, status: 'deploying', cpus: [{ id: 'c-s24', model: 'AMD EPYC', threads: 128, cpuId: 1, temperature: 30, threadsUsage: 0 }], gpus: [{ id: 'g-s24', model: 'H100', vram: 80, gpuId: 1, temperature: 35, vramUsage: 0 }] },
+            { id: 's25', ram: 256, pricePerTeraflop: 0.42, status: 'deploying', cpus: [{ id: 'c-s25', model: 'AMD EPYC', threads: 64, cpuId: 1, temperature: 30, threadsUsage: 0 }], gpus: [{ id: 'g-s25', model: 'A100', vram: 40, gpuId: 1, temperature: 35, vramUsage: 0 }] }
           ]}
         ]
       }
@@ -459,7 +459,7 @@ export const useConfigStore = defineStore('config', () => {
   const powerUsageData = [850, 890, 1020, 1050, 980, 1080, 1150, 1080] // w Watach
   const vramUtilizationData = [45, 55, 78, 85, 90, 82, 65, 75] // w %
 
-  const nodesProvided = ref<NodeMetrics[]>([
+const nodesProvided = ref<NodeMetrics[]>([
     {
       id: 'node-01',
       name: 'Politechnika - Lab AI (RTX 4090)',
@@ -467,6 +467,8 @@ export const useConfigStore = defineStore('config', () => {
       powerUsage: '340W',
       vramUsage: '18.5GB / 24GB',
       gpuTemp: '68°C',
+      cpuUsage: '12%',
+      netLatency: '5ms',
       status: 'online'
     },
     {
@@ -476,6 +478,8 @@ export const useConfigStore = defineStore('config', () => {
       powerUsage: '290W',
       vramUsage: '10GB / 24GB',
       gpuTemp: '74°C',
+      cpuUsage: '18%',
+      netLatency: '7ms',
       status: 'online'
     },
     {
@@ -485,6 +489,8 @@ export const useConfigStore = defineStore('config', () => {
       powerUsage: '0W',
       vramUsage: '0GB / 40GB',
       gpuTemp: '-',
+      cpuUsage: '-',
+      netLatency: '-',
       status: 'offline'
     }
   ])

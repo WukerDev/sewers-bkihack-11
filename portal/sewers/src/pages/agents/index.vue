@@ -64,7 +64,7 @@
         </h2>
 
         <v-card
-          v-for="temp in store.agentTemplates"
+v-for="temp in config.agentTemplates"
           :key="temp.name"
           class="template-card mb-4 pa-4 d-flex align-center"
           @click="confirmHire(temp)"
