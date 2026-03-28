@@ -7,13 +7,58 @@ import {
   TaskType,
   Cluster,
   Metrics,
-  User
+  User,
+  Invoice,
+  GetBillingResponse
 } from '../proto/main'
 
 const API_URL = 'http://localhost:8080/api'
 
 export const useConfigStore = defineStore('config', () => {
-  const MOCK_CONFIG: ConfigResponse = {
+
+    const MOCK_BILLING: GetBillingResponse = {
+    invoices: [
+      { id: "INV-2026-02", date: "2026-02-28", amount: 1420.0, status: "Opłacona" },
+      { id: "INV-2026-01", date: "2026-01-31", amount: 1150.2, status: "Opłacona" }
+    ],
+    currentMonthSpending: 502.5,
+    hourlyRate: 4.25,
+    dailySpending: [42, 38, 45, 50, 48, 60, 55, 62, 58, 65],
+    resourceUsage: [85, 72, 90]
+  }
+
+  const invoices = ref<Invoice[]>([])
+  const currentMonthSpending = ref(0)
+  const hourlyRate = ref(0)
+  const dailySpending = ref<number[]>([])
+  const resourceUsage = ref<number[]>([])
+
+  async function fetchBillingData() {
+    try {
+      const response = await fetch(`${API_URL}/BillingService/GetBilling`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({})
+      })
+      if (!response.ok) throw new Error()
+
+      const data: GetBillingResponse = await response.json()
+
+      invoices.value = data.invoices
+      currentMonthSpending.value = data.currentMonthSpending
+      hourlyRate.value = data.hourlyRate
+      dailySpending.value = data.dailySpending
+      resourceUsage.value = data.resourceUsage
+    } catch (e) {
+      invoices.value = MOCK_BILLING.invoices
+      currentMonthSpending.value = MOCK_BILLING.currentMonthSpending
+      hourlyRate.value = MOCK_BILLING.hourlyRate
+      dailySpending.value = MOCK_BILLING.dailySpending
+      resourceUsage.value = MOCK_BILLING.resourceUsage
+    }
+  }
+
+    const MOCK_CONFIG: ConfigResponse = {
     metrics: {
       onlineNodes: 128,
       totalVram: '3.2 TB',
@@ -221,31 +266,9 @@ export const useConfigStore = defineStore('config', () => {
       }
     }
   }
-
-    const invoices = ref([
-    {
-      id: "INV-2026-02",
-      date: "2026-02-28",
-      amount: 1420.0,
-      status: "Opłacona",
-    },
-    {
-      id: "INV-2026-01",
-      date: "2026-01-31",
-      amount: 1150.2,
-      status: "Opłacona",
-    },
-  ]);
-
-    const currentMonthSpending = ref(502.5);
-  const hourlyRate = ref(4.25); // Ile wydajemy na godzinę (PLN/h)
-
-  const dailySpending = ref([42, 38, 45, 50, 48, 60, 55, 62, 58, 65]);
-  const resourceUsage = ref([85, 72, 90]); // CPU, GPU, RAM w %
-
-  // Inicjalizacja przy załadowaniu Store'a
   fetchConfigData()
   fetchTasks()
+  fetchBillingData()
 
   return {
     metrics,

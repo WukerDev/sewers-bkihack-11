@@ -145,6 +145,24 @@ export interface StopTaskResponse {
   message: string;
 }
 
+export interface Invoice {
+  id: string;
+  date: string;
+  amount: number;
+  status: string;
+}
+
+export interface GetBillingRequest {
+}
+
+export interface GetBillingResponse {
+  invoices: Invoice[];
+  currentMonthSpending: number;
+  hourlyRate: number;
+  dailySpending: number[];
+  resourceUsage: number[];
+}
+
 function createBaseServer(): Server {
   return {
     id: "",
@@ -2246,6 +2264,341 @@ export const StopTaskResponse: MessageFns<StopTaskResponse> = {
     return message;
   },
 };
+
+function createBaseInvoice(): Invoice {
+  return { id: "", date: "", amount: 0, status: "" };
+}
+
+export const Invoice: MessageFns<Invoice> = {
+  encode(message: Invoice, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.id !== "") {
+      writer.uint32(10).string(message.id);
+    }
+    if (message.date !== "") {
+      writer.uint32(18).string(message.date);
+    }
+    if (message.amount !== 0) {
+      writer.uint32(25).double(message.amount);
+    }
+    if (message.status !== "") {
+      writer.uint32(34).string(message.status);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): Invoice {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseInvoice();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.id = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.date = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 25) {
+            break;
+          }
+
+          message.amount = reader.double();
+          continue;
+        }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
+
+          message.status = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): Invoice {
+    return {
+      id: isSet(object.id) ? globalThis.String(object.id) : "",
+      date: isSet(object.date) ? globalThis.String(object.date) : "",
+      amount: isSet(object.amount) ? globalThis.Number(object.amount) : 0,
+      status: isSet(object.status) ? globalThis.String(object.status) : "",
+    };
+  },
+
+  toJSON(message: Invoice): unknown {
+    const obj: any = {};
+    if (message.id !== "") {
+      obj.id = message.id;
+    }
+    if (message.date !== "") {
+      obj.date = message.date;
+    }
+    if (message.amount !== 0) {
+      obj.amount = message.amount;
+    }
+    if (message.status !== "") {
+      obj.status = message.status;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<Invoice>, I>>(base?: I): Invoice {
+    return Invoice.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<Invoice>, I>>(object: I): Invoice {
+    const message = createBaseInvoice();
+    message.id = object.id ?? "";
+    message.date = object.date ?? "";
+    message.amount = object.amount ?? 0;
+    message.status = object.status ?? "";
+    return message;
+  },
+};
+
+function createBaseGetBillingRequest(): GetBillingRequest {
+  return {};
+}
+
+export const GetBillingRequest: MessageFns<GetBillingRequest> = {
+  encode(_: GetBillingRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): GetBillingRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGetBillingRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(_: any): GetBillingRequest {
+    return {};
+  },
+
+  toJSON(_: GetBillingRequest): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<GetBillingRequest>, I>>(base?: I): GetBillingRequest {
+    return GetBillingRequest.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<GetBillingRequest>, I>>(_: I): GetBillingRequest {
+    const message = createBaseGetBillingRequest();
+    return message;
+  },
+};
+
+function createBaseGetBillingResponse(): GetBillingResponse {
+  return { invoices: [], currentMonthSpending: 0, hourlyRate: 0, dailySpending: [], resourceUsage: [] };
+}
+
+export const GetBillingResponse: MessageFns<GetBillingResponse> = {
+  encode(message: GetBillingResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    for (const v of message.invoices) {
+      Invoice.encode(v!, writer.uint32(10).fork()).join();
+    }
+    if (message.currentMonthSpending !== 0) {
+      writer.uint32(17).double(message.currentMonthSpending);
+    }
+    if (message.hourlyRate !== 0) {
+      writer.uint32(25).double(message.hourlyRate);
+    }
+    writer.uint32(34).fork();
+    for (const v of message.dailySpending) {
+      writer.double(v);
+    }
+    writer.join();
+    writer.uint32(42).fork();
+    for (const v of message.resourceUsage) {
+      writer.int32(v);
+    }
+    writer.join();
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): GetBillingResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGetBillingResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.invoices.push(Invoice.decode(reader, reader.uint32()));
+          continue;
+        }
+        case 2: {
+          if (tag !== 17) {
+            break;
+          }
+
+          message.currentMonthSpending = reader.double();
+          continue;
+        }
+        case 3: {
+          if (tag !== 25) {
+            break;
+          }
+
+          message.hourlyRate = reader.double();
+          continue;
+        }
+        case 4: {
+          if (tag === 33) {
+            message.dailySpending.push(reader.double());
+
+            continue;
+          }
+
+          if (tag === 34) {
+            const end2 = reader.uint32() + reader.pos;
+            while (reader.pos < end2) {
+              message.dailySpending.push(reader.double());
+            }
+
+            continue;
+          }
+
+          break;
+        }
+        case 5: {
+          if (tag === 40) {
+            message.resourceUsage.push(reader.int32());
+
+            continue;
+          }
+
+          if (tag === 42) {
+            const end2 = reader.uint32() + reader.pos;
+            while (reader.pos < end2) {
+              message.resourceUsage.push(reader.int32());
+            }
+
+            continue;
+          }
+
+          break;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): GetBillingResponse {
+    return {
+      invoices: globalThis.Array.isArray(object?.invoices) ? object.invoices.map((e: any) => Invoice.fromJSON(e)) : [],
+      currentMonthSpending: isSet(object.currentMonthSpending)
+        ? globalThis.Number(object.currentMonthSpending)
+        : isSet(object.current_month_spending)
+        ? globalThis.Number(object.current_month_spending)
+        : 0,
+      hourlyRate: isSet(object.hourlyRate)
+        ? globalThis.Number(object.hourlyRate)
+        : isSet(object.hourly_rate)
+        ? globalThis.Number(object.hourly_rate)
+        : 0,
+      dailySpending: globalThis.Array.isArray(object?.dailySpending)
+        ? object.dailySpending.map((e: any) => globalThis.Number(e))
+        : globalThis.Array.isArray(object?.daily_spending)
+        ? object.daily_spending.map((e: any) => globalThis.Number(e))
+        : [],
+      resourceUsage: globalThis.Array.isArray(object?.resourceUsage)
+        ? object.resourceUsage.map((e: any) => globalThis.Number(e))
+        : globalThis.Array.isArray(object?.resource_usage)
+        ? object.resource_usage.map((e: any) => globalThis.Number(e))
+        : [],
+    };
+  },
+
+  toJSON(message: GetBillingResponse): unknown {
+    const obj: any = {};
+    if (message.invoices?.length) {
+      obj.invoices = message.invoices.map((e) => Invoice.toJSON(e));
+    }
+    if (message.currentMonthSpending !== 0) {
+      obj.currentMonthSpending = message.currentMonthSpending;
+    }
+    if (message.hourlyRate !== 0) {
+      obj.hourlyRate = message.hourlyRate;
+    }
+    if (message.dailySpending?.length) {
+      obj.dailySpending = message.dailySpending;
+    }
+    if (message.resourceUsage?.length) {
+      obj.resourceUsage = message.resourceUsage.map((e) => Math.round(e));
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<GetBillingResponse>, I>>(base?: I): GetBillingResponse {
+    return GetBillingResponse.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<GetBillingResponse>, I>>(object: I): GetBillingResponse {
+    const message = createBaseGetBillingResponse();
+    message.invoices = object.invoices?.map((e) => Invoice.fromPartial(e)) || [];
+    message.currentMonthSpending = object.currentMonthSpending ?? 0;
+    message.hourlyRate = object.hourlyRate ?? 0;
+    message.dailySpending = object.dailySpending?.map((e) => e) || [];
+    message.resourceUsage = object.resourceUsage?.map((e) => e) || [];
+    return message;
+  },
+};
+
+export interface BillingService {
+  GetBilling(request: GetBillingRequest): Promise<GetBillingResponse>;
+}
+
+export const BillingServiceServiceName = "sewers.BillingService";
+export class BillingServiceClientImpl implements BillingService {
+  private readonly rpc: Rpc;
+  private readonly service: string;
+  constructor(rpc: Rpc, opts?: { service?: string }) {
+    this.service = opts?.service || BillingServiceServiceName;
+    this.rpc = rpc;
+    this.GetBilling = this.GetBilling.bind(this);
+  }
+  GetBilling(request: GetBillingRequest): Promise<GetBillingResponse> {
+    const data = GetBillingRequest.encode(request).finish();
+    const promise = this.rpc.request(this.service, "GetBilling", data);
+    return promise.then((data) => GetBillingResponse.decode(new BinaryReader(data)));
+  }
+}
 
 export interface DashboardService {
   GetConfig(request: GetConfigRequest): Promise<ConfigResponse>;
