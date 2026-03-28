@@ -89,7 +89,7 @@ onMounted(() => {
         line-width="4"
         fill
       >
-        <template v-slot:label="item"> {{ item.value }}zł </template>
+        <template v-slot:label="item"> {{ item.value }} PLN </template>
       </v-sparkline>
     </v-card>
 
