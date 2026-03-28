@@ -2,3 +2,5 @@ requests
 pynvml
 docker
 protobuf
+wmi
+py-cpuinfo
