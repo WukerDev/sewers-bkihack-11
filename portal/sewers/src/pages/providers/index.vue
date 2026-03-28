@@ -15,6 +15,24 @@ const formattedEarnings = computed(() => {
   }).format(config.monthlyEarnings);
 });
 
+const totalMonthlyCosts = computed(() => {
+  // 1. Koszt dzienny (16h): Cena * (Suma Mocy) * Przelicznik TFLOPS->kW (0.005) * 16h
+  const dayCost =
+    config.powerConfig.dayPrice *
+    (config.powerConfig.gpuDayPower + config.powerConfig.cpuDayPower) *
+    0.005 *
+    16;
+
+  // 2. Koszt nocny (8h): Cena * (Suma Mocy Nocnej) * Przelicznik TFLOPS->kW (0.005) * 8h
+  const nightCost =
+    config.powerConfig.nightPrice *
+    (config.powerConfig.gpuNightPower + config.powerConfig.cpuNightPower) *
+    0.005 *
+    8;
+
+  return parseFloat(((dayCost + nightCost) * 30).toFixed(2));
+});
+
 const dockerCommand = computed(() => {
   return `docker run -d --gpus all --name aero-node \\
   -e API_TOKEN="${config.providerToken}" \\
@@ -82,87 +100,128 @@ function getStatusColor(status: string) {
           </div>
           <v-spacer></v-spacer>
           <div class="aero-panel pa-3 d-flex flex-wrap ga-2 align-center">
-            <v-chip color="primary" label variant="flat" class="aero-chip"
-              ><v-icon start>mdi-server-network</v-icon> Węzły: 4</v-chip
+            <v-chip color="primary" label variant="flat" class="aero-chip">
+              <v-icon start>mdi-server-network</v-icon> Węzły: 4
+            </v-chip>
+
+            <v-chip color="success" label variant="flat" class="aero-chip">
+              <v-icon start>mdi-expansion-card</v-icon> GPU: 24 TFLOPS
+            </v-chip>
+
+            <v-chip
+              color="indigo-lighten-1"
+              label
+              variant="flat"
+              class="aero-chip"
             >
-            <v-chip color="success" label variant="flat" class="aero-chip"
-              ><v-icon start>mdi-brain</v-icon> Moc: ~22 TFLOPS</v-chip
-            >
-            <v-chip color="info" label variant="flat" class="aero-chip"
-              ><v-icon start>mdi-memory</v-icon> VRAM: 14.2 GB</v-chip
-            >
+              <v-icon start>mdi-cpu-64-bit</v-icon> CPU: 6 TFLOPS
+            </v-chip>
+
+            <v-chip color="info" label variant="flat" class="aero-chip">
+              <v-icon start>mdi-memory</v-icon> VRAM: 14.2 GB
+            </v-chip>
           </div>
         </v-card>
 
         <v-row>
           <v-col cols="12" md="7">
-            <v-card
-              class="vista-frame pa-1 text-center earnings-card h-100 w-100 d-flex"
-            >
-              <div
-                class="aero-window-content pa-6 d-flex flex-column justify-center align-center flex-grow-1"
-              >
-                <v-icon size="56" color="primary" class="mb-4"
-                  >mdi-cash-multiple</v-icon
-                >
-                <h2 class="text-h6 text-grey-darken-1 mb-2">
-                  Przychód w tym miesiącu
-                </h2>
-                <div class="text-h2 font-weight-black earnings-text mb-4">
-                  {{ formattedEarnings }}
-                </div>
+            <v-card class="aero-glass h-100 d-flex flex-column">
+              <!-- HEADER -->
+              <div class="aero-window-header-simple">
+                Analiza Zysków i Strat (7 dni)
+              </div>
 
-                <div
-                  class="d-flex justify-center align-center flex-wrap ga-4 mt-2 w-100"
-                >
-                  <div
-                    class="aero-panel pa-2 text-center flex-grow-1"
-                    style="max-width: 200px"
-                  >
-                    <div class="text-caption">Przewidywane (miesiąc)</div>
-                    <div class="font-weight-bold text-success">~14 000 PLN</div>
-                  </div>
-                  <div
-                    class="aero-panel pa-2 text-center flex-grow-1"
-                    style="max-width: 200px"
-                  >
-                    <div class="text-caption">Średni przychód/węzeł</div>
-                    <div class="font-weight-bold text-success">~4 150 PLN</div>
-                  </div>
-                </div>
+              <!-- CONTENT -->
+              <v-card-text class="pa-5 flex-grow-1 d-flex flex-column">
+                <div class="aero-chart-box pa-4 d-flex flex-column ga-4">
+                  <!-- PRZYCHÓD -->
+                  <div class="aero-panel-inset pa-4">
+                    <div class="d-flex justify-space-between align-center mb-2">
+                      <div class="text-caption font-weight-bold text-success">
+                        Przychód
+                      </div>
+                      <div class="font-weight-bold text-success">
+                        +{{ config.monthlyEarnings.toFixed(0) }} PLN
+                      </div>
+                    </div>
 
-                <div class="aero-panel pa-4 mt-6 w-100">
-                  <v-card-subtitle
-                    class="text-primary font-weight-bold mb-2 px-0 text-center"
-                    >Trend zarobków (7 dni)</v-card-subtitle
-                  >
-                  <div class="aero-chart-box">
                     <v-sparkline
                       :model-value="
                         config.historicalEarnings.map((d) => d.amount / 30)
                       "
-                      :labels="
+                      :labels="config.historicalEarnings.map((d) => d.day)"
+                      color="success"
+                      height="30"
+                      smooth
+                      line-width="3"
+                      fill
+                    />
+                  </div>
+
+                  <!-- KOSZT -->
+                  <div class="aero-panel-inset pa-4">
+                    <div class="d-flex justify-space-between align-center mb-2">
+                      <div class="text-caption font-weight-bold text-error">
+                        Koszt
+                      </div>
+                      <div class="font-weight-bold text-error">
+                        -{{ totalMonthlyCosts.toFixed(0) }} PLN
+                      </div>
+                    </div>
+
+                    <v-sparkline
+                      :model-value="
                         config.historicalEarnings.map(
-                          (d) => `${Math.round(d.amount / 30)}zł`,
+                          () =>
+                            totalMonthlyCosts / 30 + (Math.random() * 20 - 10),
                         )
                       "
-                      color="#16a34a"
-                      height="80"
-                      padding="20"
-                      line-width="3"
-                      label-size="7"
+                      :labels="config.historicalEarnings.map((d) => d.day)"
+                      color="error"
+                      height="30"
                       smooth
+                      line-width="3"
+                    />
+                  </div>
+
+                  <!-- PROFIT -->
+                  <div class="aero-panel-inset pa-4">
+                    <div class="d-flex justify-space-between align-center mb-2">
+                      <div class="text-caption font-weight-bold text-primary">
+                        Zysk
+                      </div>
+                      <div class="font-weight-bold text-primary">
+                        +{{
+                          (config.monthlyEarnings - totalMonthlyCosts).toFixed(
+                            0,
+                          )
+                        }}
+                        PLN
+                      </div>
+                    </div>
+
+                    <v-sparkline
+                      :model-value="
+                        config.historicalEarnings.map(
+                          (d) => d.amount / 30 - totalMonthlyCosts / 30,
+                        )
+                      "
+                      :labels="config.historicalEarnings.map((d) => d.day)"
+                      color="primary"
+                      height="30"
+                      smooth
+                      line-width="3"
                       fill
-                    ></v-sparkline>
+                    />
                   </div>
                 </div>
-              </div>
+              </v-card-text>
             </v-card>
           </v-col>
 
           <v-col cols="12" md="5">
             <v-card class="aero-glass h-100 d-flex flex-column">
-              <div class="aero-window-header-simple">System Health Monitor</div>
+              <div class="aero-window-header-simple">Monitor Systemu</div>
               <v-card-text class="pa-5 flex-grow-1 d-flex flex-column">
                 <div class="ga-4 d-flex flex-column mb-auto">
                   <v-alert class="aero-alert-warning" density="compact">
