@@ -56,9 +56,10 @@ export interface Manhole {
   windowSchedule: WindowSchedule | undefined;
   cityLongitude: number;
   cityLatitude: number;
+  pricePerTeraflop: number;
+  address: string;
   pricePerTeraflopDay: number;
   pricePerTeraflopNight: number;
-  address: string;
 }
 
 export interface Company {
@@ -827,6 +828,8 @@ function createBaseManhole(): Manhole {
     cityLatitude: 0,
     pricePerTeraflop: 0,
     address: "",
+    pricePerTeraflopDay: 0,
+    pricePerTeraflopNight: 0,
   };
 }
 
@@ -867,6 +870,12 @@ export const Manhole: MessageFns<Manhole> = {
     }
     if (message.address !== "") {
       writer.uint32(98).string(message.address);
+    }
+    if (message.pricePerTeraflopDay !== 0) {
+      writer.uint32(105).double(message.pricePerTeraflopDay);
+    }
+    if (message.pricePerTeraflopNight !== 0) {
+      writer.uint32(113).double(message.pricePerTeraflopNight);
     }
     return writer;
   },
@@ -974,6 +983,22 @@ export const Manhole: MessageFns<Manhole> = {
           message.address = reader.string();
           continue;
         }
+        case 13: {
+          if (tag !== 105) {
+            break;
+          }
+
+          message.pricePerTeraflopDay = reader.double();
+          continue;
+        }
+        case 14: {
+          if (tag !== 113) {
+            break;
+          }
+
+          message.pricePerTeraflopNight = reader.double();
+          continue;
+        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -1009,18 +1034,24 @@ export const Manhole: MessageFns<Manhole> = {
       cityLatitude: isSet(object.cityLatitude)
         ? globalThis.Number(object.cityLatitude)
         : isSet(object.city_latitude)
+        ? globalThis.Number(object.city_latitude)
         : 0,
-      pricePerTeraflopDay: isSet(object.pricePerTeraflopDay)
-        ? globalThis.Number(object.pricePerTeraflopDay)
+      pricePerTeraflop: isSet(object.pricePerTeraflop)
+        ? globalThis.Number(object.pricePerTeraflop)
         : isSet(object.price_per_teraflop)
         ? globalThis.Number(object.price_per_teraflop)
         : 0,
-        pricePerTeraflopNight: isSet(object.pricePerTeraflopNight)
-        ? globalThis.Number(object.pricePerTeraflopNight)
-        : isSet(object.price_per_teraflop)
-            ? globalThis.Number(object.price_per_teraflop)
-            : 0,
       address: isSet(object.address) ? globalThis.String(object.address) : "",
+      pricePerTeraflopDay: isSet(object.pricePerTeraflopDay)
+        ? globalThis.Number(object.pricePerTeraflopDay)
+        : isSet(object.price_per_teraflop_day)
+        ? globalThis.Number(object.price_per_teraflop_day)
+        : 0,
+      pricePerTeraflopNight: isSet(object.pricePerTeraflopNight)
+        ? globalThis.Number(object.pricePerTeraflopNight)
+        : isSet(object.price_per_teraflop_night)
+        ? globalThis.Number(object.price_per_teraflop_night)
+        : 0,
     };
   },
 
@@ -1056,14 +1087,17 @@ export const Manhole: MessageFns<Manhole> = {
     if (message.cityLatitude !== 0) {
       obj.cityLatitude = message.cityLatitude;
     }
-    if (message.pricePerTeraflopDay !== 0) {
-      obj.pricePerTeraflop = message.pricePerTeraflopDay;
-    }
-    if (message.pricePerTeraflopNight !== 0) {
-      obj.pricePerTeraflop = message.pricePerTeraflopNight;
+    if (message.pricePerTeraflop !== 0) {
+      obj.pricePerTeraflop = message.pricePerTeraflop;
     }
     if (message.address !== "") {
       obj.address = message.address;
+    }
+    if (message.pricePerTeraflopDay !== 0) {
+      obj.pricePerTeraflopDay = message.pricePerTeraflopDay;
+    }
+    if (message.pricePerTeraflopNight !== 0) {
+      obj.pricePerTeraflopNight = message.pricePerTeraflopNight;
     }
     return obj;
   },
@@ -1087,9 +1121,10 @@ export const Manhole: MessageFns<Manhole> = {
       : undefined;
     message.cityLongitude = object.cityLongitude ?? 0;
     message.cityLatitude = object.cityLatitude ?? 0;
-    message.pricePerTeraflopDay = object.pricePerTeraflopDay ?? 0;
-    message.pricePerTeraflopNight = object.pricePerTeraflopNight ?? 0
+    message.pricePerTeraflop = object.pricePerTeraflop ?? 0;
     message.address = object.address ?? "";
+    message.pricePerTeraflopDay = object.pricePerTeraflopDay ?? 0;
+    message.pricePerTeraflopNight = object.pricePerTeraflopNight ?? 0;
     return message;
   },
 };
